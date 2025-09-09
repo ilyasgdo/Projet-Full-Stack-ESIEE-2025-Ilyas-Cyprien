@@ -4,6 +4,7 @@ import os
 import secrets
 from datetime import datetime, timedelta
 from models import db, Question, Answer, Participation, AdminSession
+from auth import generate_token, token_required
 
 app = Flask(__name__)
 CORS(app)
@@ -117,38 +118,187 @@ def admin_login():
     password = data.get('password', '')
     
     if password == app.config['ADMIN_PASSWORD']:
-        # TODO: Generate proper JWT token
-        token = "sample-admin-token-123"
+        token = generate_token()
         return jsonify({"token": token})
     else:
         return jsonify({"error": "Invalid password"}), 401
 
 # Admin endpoints (protected)
 @app.route('/questions', methods=['POST'])
+@token_required
 def create_question():
-    # TODO: Implement token validation middleware
-    # TODO: Implement question creation
-    return jsonify({"id": 1}), 201
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['title', 'text', 'position', 'possibleAnswers']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        # Validate answers
+        answers = data.get('possibleAnswers', [])
+        if len(answers) != 4:
+            return jsonify({"error": "Exactly 4 answers are required"}), 400
+        
+        correct_answers = [a for a in answers if a.get('isCorrect', False)]
+        if len(correct_answers) != 1:
+            return jsonify({"error": "Exactly one correct answer is required"}), 400
+        
+        # Check if position is available or shift existing questions
+        position = data.get('position')
+        existing_question = Question.query.filter_by(position=position).first()
+        if existing_question:
+            # Shift questions at and after this position
+            questions_to_shift = Question.query.filter(Question.position >= position).all()
+            for q in questions_to_shift:
+                q.position += 1
+        
+        # Create question
+        question = Question(
+            position=position,
+            title=data.get('title'),
+            text=data.get('text'),
+            image=data.get('image')
+        )
+        db.session.add(question)
+        db.session.flush()  # Get question ID
+        
+        # Create answers
+        for answer_data in answers:
+            answer = Answer(
+                question_id=question.id,
+                text=answer_data.get('text'),
+                is_correct=answer_data.get('isCorrect', False)
+            )
+            db.session.add(answer)
+        
+        db.session.commit()
+        return jsonify({"id": question.id}), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/questions/<int:question_id>', methods=['PUT'])
+@token_required
 def update_question(question_id):
-    # TODO: Implement token validation and question update
-    return '', 204
+    try:
+        question = Question.query.get_or_404(question_id)
+        data = request.get_json()
+        
+        # Validate answers if provided
+        if 'possibleAnswers' in data:
+            answers = data.get('possibleAnswers', [])
+            if len(answers) != 4:
+                return jsonify({"error": "Exactly 4 answers are required"}), 400
+            
+            correct_answers = [a for a in answers if a.get('isCorrect', False)]
+            if len(correct_answers) != 1:
+                return jsonify({"error": "Exactly one correct answer is required"}), 400
+        
+        # Handle position change
+        if 'position' in data and data['position'] != question.position:
+            new_position = data['position']
+            old_position = question.position
+            
+            if new_position > old_position:
+                # Moving down: shift questions between old and new position up
+                questions_to_shift = Question.query.filter(
+                    Question.position > old_position,
+                    Question.position <= new_position,
+                    Question.id != question_id
+                ).all()
+                for q in questions_to_shift:
+                    q.position -= 1
+            else:
+                # Moving up: shift questions between new and old position down
+                questions_to_shift = Question.query.filter(
+                    Question.position >= new_position,
+                    Question.position < old_position,
+                    Question.id != question_id
+                ).all()
+                for q in questions_to_shift:
+                    q.position += 1
+            
+            question.position = new_position
+        
+        # Update question fields
+        if 'title' in data:
+            question.title = data['title']
+        if 'text' in data:
+            question.text = data['text']
+        if 'image' in data:
+            question.image = data['image']
+        
+        question.updated_at = datetime.utcnow()
+        
+        # Update answers if provided
+        if 'possibleAnswers' in data:
+            # Delete existing answers
+            Answer.query.filter_by(question_id=question_id).delete()
+            
+            # Create new answers
+            for answer_data in data['possibleAnswers']:
+                answer = Answer(
+                    question_id=question_id,
+                    text=answer_data.get('text'),
+                    is_correct=answer_data.get('isCorrect', False)
+                )
+                db.session.add(answer)
+        
+        db.session.commit()
+        return '', 204
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/questions/<int:question_id>', methods=['DELETE'])
+@token_required
 def delete_question(question_id):
-    # TODO: Implement token validation and question deletion
-    return '', 204
+    try:
+        question = Question.query.get_or_404(question_id)
+        position_to_delete = question.position
+        
+        # Delete the question (answers will be deleted by cascade)
+        db.session.delete(question)
+        
+        # Shift subsequent questions up
+        questions_to_shift = Question.query.filter(Question.position > position_to_delete).all()
+        for q in questions_to_shift:
+            q.position -= 1
+        
+        db.session.commit()
+        return '', 204
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/questions/all', methods=['DELETE'])
+@token_required
 def delete_all_questions():
-    # TODO: Implement token validation and bulk deletion
-    return '', 204
+    try:
+        Question.query.delete()
+        db.session.commit()
+        return '', 204
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/participations/all', methods=['DELETE'])
+@token_required
 def delete_all_participations():
-    # TODO: Implement token validation and bulk deletion
-    return '', 204
+    try:
+        Participation.query.delete()
+        db.session.commit()
+        return '', 204
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 def init_database():
     """Initialize database with sample data"""

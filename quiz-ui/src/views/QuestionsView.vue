@@ -1,87 +1,102 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-      <!-- Progress Bar -->
-      <div class="mb-6">
-        <div class="flex justify-between text-sm text-gray-600 mb-2">
-          <span>Question {{ currentPosition }} sur {{ totalQuestions || '?' }}</span>
-          <span>{{ playerName }}</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            :style="{ width: progressPercentage + '%' }"
-          ></div>
-        </div>
-      </div>
-
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
       <!-- Loading State -->
-      <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">Chargement de la question...</p>
-      </div>
-
-      <!-- Question Display -->
-      <div v-else-if="currentQuestion" class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">
-          {{ currentQuestion.title }}
-        </h2>
-        
-        <img 
-          v-if="currentQuestion.image" 
-          :src="currentQuestion.image"
-          :alt="currentQuestion.title"
-          class="w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
-        />
-        
-        <p class="text-lg text-gray-800 mb-6">
-          {{ currentQuestion.text }}
-        </p>
-        
-        <div class="space-y-3">
-          <label 
-            v-for="answer in currentQuestion.possibleAnswers" 
-            :key="answer.id"
-            class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition duration-200"
-          >
-            <input
-              v-model="selectedAnswer"
-              type="radio"
-              :value="answer.id"
-              name="answer"
-              class="mr-3 text-blue-600"
-            />
-            <span class="text-gray-900">{{ answer.text }}</span>
-          </label>
-        </div>
-        
-        <div class="mt-6 flex justify-between">
-          <button
-            @click="goHome"
-            class="px-4 py-2 text-gray-600 hover:text-gray-800 transition duration-200"
-          >
-            ← Abandonner
-          </button>
-          
-          <button
-            @click="nextQuestion"
-            :disabled="!selectedAnswer"
-            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
-          >
-            {{ isLastQuestion ? 'Terminer' : 'Suivant' }}
-          </button>
-        </div>
+      <div v-if="loading" class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p class="text-muted-foreground">Chargement des questions...</p>
       </div>
 
       <!-- Error State -->
-      <div v-else class="text-center py-12">
-        <p class="text-red-600 mb-4">Erreur lors du chargement de la question</p>
-        <button
-          @click="goHome"
-          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
-        >
+      <div v-else-if="!currentQuestion" class="text-center">
+        <div class="text-6xl mb-4">❌</div>
+        <h2 class="text-2xl font-bold mb-2">Erreur</h2>
+        <p class="text-destructive mb-6">Erreur lors du chargement de la question</p>
+        <Button variant="outline" @click="goHome">
           Retour à l'accueil
-        </button>
+        </Button>
+      </div>
+
+      <!-- Quiz Content -->
+      <div v-else-if="currentQuestion">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm text-muted-foreground">
+              Question {{ currentPosition }} sur {{ totalQuestions || '?' }}
+            </span>
+            <span class="text-sm text-muted-foreground">
+              {{ Math.round(progressPercentage) }}%
+            </span>
+          </div>
+          <div class="w-full bg-secondary rounded-full h-2">
+            <div 
+              class="bg-primary h-2 rounded-full transition-all duration-300"
+              :style="{ width: progressPercentage + '%' }"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-card rounded-lg border p-6 mb-6">
+          <h2 class="text-xl font-semibold mb-6">{{ currentQuestion.title }}</h2>
+          
+          <img 
+            v-if="currentQuestion.image" 
+            :src="currentQuestion.image"
+            :alt="currentQuestion.title"
+            class="w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
+          />
+          
+          <p v-if="currentQuestion.text" class="text-lg mb-6">
+            {{ currentQuestion.text }}
+          </p>
+          
+          <div class="space-y-3">
+            <button
+              v-for="answer in currentQuestion.possibleAnswers"
+              :key="answer.id"
+              @click="selectedAnswer = answer.id"
+              :class="[
+                'w-full p-4 text-left rounded-lg border transition-all duration-200',
+                selectedAnswer === answer.id
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border hover:border-primary/50 hover:bg-accent'
+              ]"
+            >
+              <div class="flex items-center">
+                <div 
+                  :class="[
+                    'w-4 h-4 rounded-full border-2 mr-3 transition-all',
+                    selectedAnswer === answer.id
+                      ? 'border-primary bg-primary'
+                      : 'border-border'
+                  ]"
+                ></div>
+                {{ answer.text }}
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between items-center">
+          <Button
+            variant="ghost"
+            @click="goHome"
+            class="text-muted-foreground"
+          >
+            ← Abandonner
+          </Button>
+          
+          <Button
+            @click="nextQuestion"
+            :disabled="!selectedAnswer"
+            size="lg"
+          >
+            {{ isLastQuestion ? 'Terminer' : 'Suivant' }}
+          </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -90,6 +105,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@/components/ui/button'
 import QuizApiService from '@/services/QuizApiService'
 import ParticipationStorageService from '@/services/ParticipationStorageService'
 

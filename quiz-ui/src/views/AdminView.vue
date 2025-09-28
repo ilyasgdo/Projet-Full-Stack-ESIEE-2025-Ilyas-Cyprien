@@ -1,85 +1,90 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="py-8">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold text-gray-900 mb-8">Administration</h1>
-      
+      <h1 class="text-3xl font-bold text-center mb-8">Administration</h1>
+
       <!-- Login Form -->
-      <div v-if="!isAuthenticated" class="max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6 text-center">Connexion Administrateur</h2>
-        
-        <form @submit.prevent="login">
-          <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Entrez le mot de passe admin"
-            />
-          </div>
-          
-          <div v-if="loginError" class="mb-4 text-red-600 text-sm">
-            {{ loginError }}
-          </div>
-          
-          <button
-            type="submit"
-            :disabled="loginLoading"
-            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-md transition duration-200"
-          >
-            {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
-          </button>
-        </form>
-        
-        <div class="mt-4 text-center">
-          <router-link 
-            to="/"
-            class="text-sm text-gray-600 hover:text-gray-800"
-          >
-            ← Retour à l'accueil
-          </router-link>
-        </div>
+      <div v-if="!isAuthenticated">
+        <Card class="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle class="text-center">Connexion Administrateur</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form @submit.prevent="login" class="space-y-4">
+              <div>
+                <label for="password" class="block text-sm font-medium mb-2">
+                  Mot de passe
+                </label>
+                <input
+                  id="password"
+                  v-model="password"
+                  type="password"
+                  required
+                  class="w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+                  placeholder="Entrez le mot de passe administrateur"
+                />
+              </div>
+              
+              <Button type="submit" class="w-full" size="lg">
+                Se connecter
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
 
       <!-- Admin Dashboard -->
-      <div v-else>
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold text-gray-900">Tableau de bord</h2>
-          <button
-            @click="logout"
-            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
-          >
-            Déconnexion
-          </button>
+      <div v-else class="space-y-8">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-semibold">Tableau de bord</h2>
+          <Button variant="ghost" as-child>
+            <button @click="logout">
+              Déconnexion
+            </button>
+          </Button>
         </div>
-        
-        <div class="bg-white shadow-lg rounded-lg p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions disponibles</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 border border-gray-200 rounded-lg">
-              <h4 class="font-medium text-gray-900 mb-2">Gestion des Questions</h4>
-              <p class="text-sm text-gray-600 mb-3">Créer, modifier et supprimer les questions du quiz</p>
-              <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-200">
-                Gérer les Questions
-              </button>
-            </div>
-            
-            <div class="p-4 border border-gray-200 rounded-lg">
-              <h4 class="font-medium text-gray-900 mb-2">Gestion des Participations</h4>
-              <p class="text-sm text-gray-600 mb-3">Voir et supprimer les participations enregistrées</p>
-              <button 
-                @click="confirmDeleteParticipations"
-                class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition duration-200"
-              >
-                Supprimer Participations
-              </button>
-            </div>
-          </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- Questions Management -->
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des Questions</CardTitle>
+            </CardHeader>
+            <CardContent class="space-y-4">
+              <p class="text-muted-foreground">
+                Gérez les questions du quiz, ajoutez de nouvelles questions ou modifiez les existantes.
+              </p>
+              <Button class="w-full sm:w-auto">
+                <router-link to="/questions">
+                  Gérer les Questions
+                </router-link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <!-- Participations Management -->
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des Participations</CardTitle>
+            </CardHeader>
+            <CardContent class="space-y-4">
+              <p class="text-muted-foreground">
+                Consultez les participations et gérez les scores des utilisateurs.
+              </p>
+              <div class="space-y-2">
+                <Button variant="outline" class="w-full sm:w-auto">
+                  Voir les Participations
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  @click="confirmDeleteParticipations"
+                  class="w-full sm:w-auto"
+                >
+                  Supprimer Toutes les Participations
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
@@ -88,6 +93,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import QuizApiService from '@/services/QuizApiService'
 import AuthStorageService from '@/services/AuthStorageService'
 

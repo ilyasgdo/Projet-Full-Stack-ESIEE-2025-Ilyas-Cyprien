@@ -217,7 +217,7 @@ def create_question():
                 question_id=question.id,
                 text=answer_data.get('text'),
                 is_correct=answer_data.get('isCorrect', False),
-                order=i  # Set the order based on the position in the array
+                order=i + 1
             )
             db.session.add(answer)
         
@@ -316,7 +316,7 @@ def update_question(question_id):
                     question_id=question_id,
                     text=answer_data.get('text'),
                     is_correct=answer_data.get('isCorrect', False),
-                    order=i  # Set the order based on the position in the array
+                    order=i + 1
                 )
                 db.session.add(answer)
         
@@ -365,6 +365,7 @@ def delete_question(question_id):
 @token_required
 def delete_all_questions():
     try:
+        Answer.query.delete()
         Question.query.delete()
         db.session.commit()
         return '', 204

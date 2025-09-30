@@ -16,13 +16,15 @@ class Question(db.Model):
     answers = db.relationship('Answer', backref='question', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
+        # Sort answers by order field to ensure consistent ordering
+        sorted_answers = sorted(self.answers, key=lambda a: a.order)
         return {
             'id': self.id,
             'position': self.position,
             'title': self.title,
             'text': self.text,
             'image': self.image,
-            'possibleAnswers': [answer.to_dict() for answer in self.answers]
+            'possibleAnswers': [answer.to_dict() for answer in sorted_answers]
         }
 
 class Answer(db.Model):
@@ -30,12 +32,14 @@ class Answer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     text = db.Column(db.String(500), nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False, default=False)
+    order = db.Column(db.Integer, nullable=False, default=0)
     
     def to_dict(self):
         return {
             'id': self.id,
             'text': self.text,
-            'isCorrect': self.is_correct
+            'isCorrect': self.is_correct,
+            'order': self.order
         }
 
 class Participation(db.Model):

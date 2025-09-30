@@ -190,25 +190,16 @@ def create_question():
             max_position = db.session.query(db.func.max(Question.position)).scalar() or 0
             position = max_position + 1
         
-        # Use a different approach: find the highest position and shift from there
+        # Shift existing questions at or after the target position down by one
         existing_question = Question.query.filter_by(position=position).first()
         if existing_question:
-            # Get all questions at or after this position, ordered by position DESC
-            questions_to_shift = Question.query.filter(Question.position >= position).order_by(Question.position.desc()).all()
-            
-            # Update positions in reverse order to avoid conflicts
-            for i, q in enumerate(questions_to_shift):
-                # Use a temporary high position to avoid conflicts
-                temp_position = 10000 + i
-                q.position = temp_position
-            
-            db.session.flush()
-            
-            # Now set the correct positions
-            for i, q in enumerate(questions_to_shift):
-                q.position = position + 1 + i
-            
-            db.session.flush()
+            # Move in descending order to avoid unique conflicts
+            questions_to_shift = Question.query.filter(
+                Question.position >= position
+            ).order_by(Question.position.desc()).all()
+            for q in questions_to_shift:
+                q.position = q.position + 1
+                db.session.flush()
         
         # Create question
         question = Question(

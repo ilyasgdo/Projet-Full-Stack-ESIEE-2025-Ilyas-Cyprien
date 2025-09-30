@@ -17,7 +17,7 @@ const router = createRouter({
     {
       path: '/questions',
       name: 'questions',
-      component: () => import('../views/QuestionsView.vue')
+      component: () => import('../views/QuizView.vue')
     },
     {
       path: '/score',
@@ -28,6 +28,11 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue')
+    },
+    {
+      path: '/admin/questions',
+      name: 'questions-management',
+      component: () => import('../views/QuestionsManagementView.vue')
     }
   ]
 })

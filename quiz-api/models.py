@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    position = db.Column(db.Integer, unique=True, nullable=False)
+    position = db.Column(db.Integer, unique=True, nullable=True)
     title = db.Column(db.String(200), nullable=False)
     text = db.Column(db.Text, nullable=False)
     image = db.Column(db.Text)  # Base64 encoded image

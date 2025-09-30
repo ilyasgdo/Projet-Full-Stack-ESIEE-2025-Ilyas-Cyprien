@@ -55,7 +55,7 @@
                 Gérez les questions du quiz, ajoutez de nouvelles questions ou modifiez les existantes.
               </p>
               <Button class="w-full sm:w-auto">
-                <router-link to="/questions">
+                <router-link to="/admin/questions">
                   Gérer les Questions
                 </router-link>
               </Button>

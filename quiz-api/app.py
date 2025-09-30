@@ -41,6 +41,17 @@ def get_quiz_info():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/questions/all', methods=['GET'])
+@token_required
+def get_all_questions():
+    try:
+        questions = Question.query.order_by(Question.position).all()
+        return jsonify({
+            "questions": [q.to_dict() for q in questions]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/questions/<int:question_id>', methods=['GET'])
 def get_question_by_id(question_id):
     try:
@@ -147,12 +158,30 @@ def create_question():
         
         # Check if position is available or shift existing questions
         position = data.get('position')
+        if position is None:
+            # If no position specified, assign to the end
+            max_position = db.session.query(db.func.max(Question.position)).scalar() or 0
+            position = max_position + 1
+        
+        # Use a different approach: find the highest position and shift from there
         existing_question = Question.query.filter_by(position=position).first()
         if existing_question:
-            # Shift questions at and after this position
-            questions_to_shift = Question.query.filter(Question.position >= position).all()
-            for q in questions_to_shift:
-                q.position += 1
+            # Get all questions at or after this position, ordered by position DESC
+            questions_to_shift = Question.query.filter(Question.position >= position).order_by(Question.position.desc()).all()
+            
+            # Update positions in reverse order to avoid conflicts
+            for i, q in enumerate(questions_to_shift):
+                # Use a temporary high position to avoid conflicts
+                temp_position = 10000 + i
+                q.position = temp_position
+            
+            db.session.flush()
+            
+            # Now set the correct positions
+            for i, q in enumerate(questions_to_shift):
+                q.position = position + 1 + i
+            
+            db.session.flush()
         
         # Create question
         question = Question(
@@ -202,6 +231,10 @@ def update_question(question_id):
             new_position = data['position']
             old_position = question.position
             
+            # Temporarily set position to None to avoid constraint violations
+            question.position = None
+            db.session.flush()
+            
             if new_position > old_position:
                 # Moving down: shift questions between old and new position up
                 questions_to_shift = Question.query.filter(
@@ -221,6 +254,7 @@ def update_question(question_id):
                 for q in questions_to_shift:
                     q.position += 1
             
+            db.session.flush()  # Commit position changes
             question.position = new_position
         
         # Update question fields

@@ -54,6 +54,10 @@ export default {
   },
 
   // Admin endpoints (require token)
+  getAllQuestions(token) {
+    return this.call('get', '/questions/all', null, token)
+  },
+
   createQuestion(questionData, token) {
     return this.call('post', '/questions', questionData, token)
   },

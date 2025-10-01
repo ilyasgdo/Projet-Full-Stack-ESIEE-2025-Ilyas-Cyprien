@@ -54,12 +54,12 @@
           
           <div class="space-y-3">
             <button
-              v-for="answer in currentQuestion.possibleAnswers"
+              v-for="(answer, idx) in currentQuestion.possibleAnswers"
               :key="answer.id"
-              @click="selectedAnswer = answer.id"
+              @click="selectedAnswer = idx + 1"
               :class="[
                 'w-full p-4 text-left rounded-lg border transition-all duration-200',
-                selectedAnswer === answer.id
+                selectedAnswer === (idx + 1)
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border hover:border-primary/50 hover:bg-accent'
               ]"
@@ -68,7 +68,7 @@
                 <div 
                   :class="[
                     'w-4 h-4 rounded-full border-2 mr-3 transition-all',
-                    selectedAnswer === answer.id
+                    selectedAnswer === (idx + 1)
                       ? 'border-primary bg-primary'
                       : 'border-border'
                   ]"
@@ -151,7 +151,8 @@ const loadQuestion = async () => {
   loading.value = true
   try {
     const response = await QuizApiService.getQuestionByPosition(currentPosition.value)
-    currentQuestion.value = response.data.question
+    // The API returns the question directly, not wrapped in a 'question' property
+    currentQuestion.value = response.data
     selectedAnswer.value = null
   } catch (error) {
     console.error('Failed to load question:', error)

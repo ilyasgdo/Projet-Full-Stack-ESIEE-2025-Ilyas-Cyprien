@@ -43,7 +43,7 @@ export default {
 
   submitParticipation(playerName, answers) {
     return this.call('post', '/participations', {
-      player_name: playerName,
+      playerName: playerName,
       answers: answers
     })
   },

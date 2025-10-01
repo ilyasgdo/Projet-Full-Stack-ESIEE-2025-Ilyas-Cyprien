@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu } from 'lucide-vue-next'
+import NotificationContainer from '@/components/NotificationContainer.vue'
 
 const isMenuOpen = ref(false)
 </script>
@@ -90,6 +91,9 @@ const isMenuOpen = ref(false)
         </div>
       </div>
     </footer>
+    
+    <!-- Notifications -->
+    <NotificationContainer />
   </div>
 </template>
 

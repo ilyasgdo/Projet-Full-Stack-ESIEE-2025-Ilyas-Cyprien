@@ -89,6 +89,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import QuizApiService from '@/services/QuizApiService'
+import NotificationService from '@/services/NotificationService'
 
 const scores = ref([])
 const loading = ref(true)
@@ -112,6 +113,7 @@ onMounted(async () => {
     scores.value = response.data.scores || []
   } catch (error) {
     console.error('Failed to load quiz info:', error)
+    NotificationService.handleApiError(error)
   } finally {
     loading.value = false
   }

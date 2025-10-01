@@ -154,33 +154,12 @@
             </div>
 
             <div class="space-y-2">
-              <Label>Image (optionnelle)</Label>
-              <div v-if="!form.image" 
-                   @click="triggerFileInput"
-                   class="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors">
-                <input 
-                  ref="fileInput" 
-                  type="file" 
-                  @change="handleImageUpload" 
-                  accept="image/*" 
-                  class="hidden"
-                />
-                <Upload class="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p class="text-sm text-muted-foreground mb-1">Cliquez pour sélectionner une image</p>
-                <p class="text-xs text-muted-foreground">Formats acceptés: JPG, PNG, GIF (max 5MB)</p>
-              </div>
-              <div v-else class="relative">
-                <img :src="form.image" alt="Preview" class="max-w-full h-auto rounded-md border" />
-                <Button 
-                  type="button" 
-                  @click="removeImage" 
-                  variant="destructive"
-                  size="sm"
-                  class="absolute top-2 right-2 gap-1"
-                >
-                  <Trash2 class="h-3 w-3" />
-                </Button>
-              </div>
+              <ImageUpload 
+                label="Image (optionnelle)"
+                :file-data-url="form.image"
+                :max-size-bytes="1024 * 1024"
+                @file-change="handleImageChange"
+              />
               <p v-if="errors.image" class="text-sm text-destructive">{{ errors.image }}</p>
             </div>
 
@@ -274,7 +253,6 @@ import {
   HelpCircle, 
   CheckCircle, 
   Circle, 
-  Upload, 
   Save, 
   Loader2 
 } from 'lucide-vue-next'
@@ -286,8 +264,10 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import ImageUpload from '@/components/ImageUpload.vue'
 import QuizApiService from '../services/QuizApiService.js'
 import AuthStorageService from '../services/AuthStorageService.js'
+import NotificationService from '../services/NotificationService.js'
 
 // Data
 const questions = ref([])
@@ -321,9 +301,6 @@ const form = ref({
 // Validation
 const errors = ref({})
 
-// File input ref
-const fileInput = ref(null)
-
 onMounted(async () => {
   await loadQuestions()
 })
@@ -343,6 +320,7 @@ const loadQuestions = async () => {
     }
   } catch (error) {
     console.error('Erreur lors du chargement des questions:', error)
+    NotificationService.handleApiError(error)
     questions.value = []
   } finally {
     loading.value = false
@@ -379,8 +357,10 @@ const executeDelete = async () => {
     
     if (questionToDelete.value) {
       await QuizApiService.deleteQuestion(questionToDelete.value.id, token)
+      NotificationService.success('Question supprimée avec succès')
     } else {
       await QuizApiService.deleteAllQuestions(token)
+      NotificationService.success('Toutes les questions ont été supprimées')
     }
     
     await loadQuestions()
@@ -388,6 +368,7 @@ const executeDelete = async () => {
     questionToDelete.value = null
   } catch (error) {
     console.error('Erreur lors de la suppression:', error)
+    NotificationService.handleApiError(error)
   } finally {
     deleting.value = false
   }
@@ -409,28 +390,18 @@ const saveQuestion = async () => {
     if (editingQuestion.value) {
       const response = await QuizApiService.updateQuestion(editingQuestion.value.id, questionData, token)
       console.log('Update response:', response)
+      NotificationService.success('Question modifiée avec succès')
     } else {
       const response = await QuizApiService.createQuestion(questionData, token)
       console.log('Create response:', response)
+      NotificationService.success('Question créée avec succès')
     }
     
     await loadQuestions()
     closeModal()
-    
-    // Show success notification
-    console.log('Question sauvegardée avec succès!')
   } catch (error) {
     console.error('Erreur lors de la sauvegarde:', error)
-    
-    // Extract meaningful error message
-    let errorMessage = 'Erreur lors de la sauvegarde'
-    if (error.response?.data?.error) {
-      errorMessage = error.response.data.error
-    } else if (error.message) {
-      errorMessage = error.message
-    }
-    
-    console.error('Erreur lors de la sauvegarde:', errorMessage)
+    NotificationService.handleApiError(error)
   } finally {
     saving.value = false
   }
@@ -514,39 +485,9 @@ const resetForm = () => {
   }
 }
 
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-  
-  // Validate file size (5MB max)
-  if (file.size > 5 * 1024 * 1024) {
-    errors.value.image = 'La taille du fichier ne peut pas dépasser 5MB'
-    return
-  }
-  
-  // Validate file type
-  if (!file.type.startsWith('image/')) {
-    errors.value.image = 'Seuls les fichiers image sont acceptés'
-    return
-  }
-  
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.value.image = e.target.result
-    delete errors.value.image
-  }
-  reader.readAsDataURL(file)
-}
-
-const removeImage = () => {
-  form.value.image = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+const handleImageChange = (base64String) => {
+  form.value.image = base64String
+  delete errors.value.image
 }
 
 const truncateText = (text, maxLength) => {

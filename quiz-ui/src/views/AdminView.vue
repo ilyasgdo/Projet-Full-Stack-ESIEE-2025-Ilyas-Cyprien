@@ -11,22 +11,22 @@
           </CardHeader>
           <CardContent>
             <form @submit.prevent="login" class="space-y-4">
-              <div>
+              <div class="space-y-2">
                 <label for="password" class="block text-sm font-medium mb-2">
                   Mot de passe
                 </label>
-                <input
+                <Input
                   id="password"
                   v-model="password"
                   type="password"
                   required
-                  class="w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                   placeholder="Entrez le mot de passe administrateur"
                 />
               </div>
               
-              <Button type="submit" class="w-full" size="lg">
-                Se connecter
+              <Button type="submit" class="w-full gap-2" size="lg" :disabled="loginLoading">
+                <Loader2 v-if="loginLoading" class="h-4 w-4 animate-spin" />
+                {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
               </Button>
               <p v-if="loginError" class="text-center text-sm text-destructive">{{ loginError }}</p>
             </form>
@@ -79,9 +79,11 @@
                 <Button 
                   variant="destructive" 
                   @click="confirmDeleteParticipations"
-                  class="w-full sm:w-auto"
+                  class="w-full sm:w-auto gap-2"
+                  :disabled="deletingParticipations"
                 >
-                  Supprimer Toutes les Participations
+                  <Loader2 v-if="deletingParticipations" class="h-4 w-4 animate-spin" />
+                  {{ deletingParticipations ? 'Suppression...' : 'Supprimer Toutes les Participations' }}
                 </Button>
               </div>
             </CardContent>
@@ -93,16 +95,20 @@
 </template>
 
 <script setup>
+import { Loader2 } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import QuizApiService from '@/services/QuizApiService'
 import AuthStorageService from '@/services/AuthStorageService'
+import NotificationService from '@/services/NotificationService'
 
 const isAuthenticated = ref(false)
 const password = ref('')
 const loginError = ref('')
 const loginLoading = ref(false)
+const deletingParticipations = ref(false)
 
 onMounted(() => {
   isAuthenticated.value = AuthStorageService.isAuthenticated()
@@ -117,8 +123,10 @@ const login = async () => {
     AuthStorageService.saveToken(response.data.token)
     isAuthenticated.value = true
     password.value = ''
+    NotificationService.success('Connexion réussie')
   } catch (error) {
     loginError.value = 'Mauvais mot de passe'
+    NotificationService.error('Échec de la connexion')
   } finally {
     loginLoading.value = false
   }
@@ -137,11 +145,14 @@ const confirmDeleteParticipations = () => {
 
 const deleteAllParticipations = async () => {
   try {
+    deletingParticipations.value = true
     const token = AuthStorageService.getToken()
     await QuizApiService.deleteAllParticipations(token)
-    alert('Toutes les participations ont été supprimées')
+    NotificationService.success('Toutes les participations ont été supprimées')
   } catch (error) {
-    alert('Erreur lors de la suppression des participations')
+    NotificationService.handleApiError(error)
+  } finally {
+    deletingParticipations.value = false
   }
 }
 </script>

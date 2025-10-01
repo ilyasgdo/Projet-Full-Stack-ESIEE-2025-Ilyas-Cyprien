@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
 import secrets
+import base64
 from datetime import datetime, timedelta
 from models import db, Question, Answer, Participation, AdminSession
 from auth import generate_token, token_required
+from validation import validate_base64_image
 
 app = Flask(__name__)
 CORS(app)
@@ -14,6 +16,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'iloveflask')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_IMAGE_SIZE_BYTES'] = 1024 * 1024  # 1MB
 
 # Initialize database
 db.init_app(app)
@@ -183,6 +186,13 @@ def create_question():
         if len(correct_answers) != 1:
             return jsonify({"error": "Exactly one correct answer is required"}), 400
         
+        # Validate image if provided
+        image = data.get('image')
+        if image:
+            is_valid, error_message = validate_base64_image(image)
+            if not is_valid:
+                return jsonify({"error": error_message}), 400
+        
         # Check if position is available or shift existing questions
         position = data.get('position')
         if position is None:
@@ -252,6 +262,14 @@ def update_question(question_id):
                 correct_answers = [a for a in answers if a.get('isCorrect', False)]
                 if len(correct_answers) > 1:
                     return jsonify({"error": "At most one correct answer is allowed"}), 400
+        
+        # Validate image if provided
+        if 'image' in data:
+            image = data.get('image')
+            if image:  # Only validate if image is not None/empty
+                is_valid, error_message = validate_base64_image(image)
+                if not is_valid:
+                    return jsonify({"error": error_message}), 400
         
         # Handle position change
         if 'position' in data and data['position'] != question.position:

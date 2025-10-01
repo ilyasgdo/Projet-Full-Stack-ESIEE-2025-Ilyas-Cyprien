@@ -28,6 +28,7 @@
               <Button type="submit" class="w-full" size="lg">
                 Se connecter
               </Button>
+              <p v-if="loginError" class="text-center text-sm text-destructive">{{ loginError }}</p>
             </form>
           </CardContent>
         </Card>
@@ -117,7 +118,7 @@ const login = async () => {
     isAuthenticated.value = true
     password.value = ''
   } catch (error) {
-    loginError.value = 'Mot de passe incorrect'
+    loginError.value = 'Mauvais mot de passe'
   } finally {
     loginLoading.value = false
   }

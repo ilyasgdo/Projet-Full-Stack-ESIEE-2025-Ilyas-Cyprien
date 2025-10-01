@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import AuthStorageService from '@/services/AuthStorageService'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,8 +16,8 @@ const router = createRouter({
       component: () => import('../views/NewQuizView.vue')
     },
     {
-      path: '/questions',
-      name: 'questions',
+      path: '/quiz',
+      name: 'quiz',
       component: () => import('../views/QuizView.vue')
     },
     {
@@ -32,9 +33,19 @@ const router = createRouter({
     {
       path: '/admin/questions',
       name: 'questions-management',
-      component: () => import('../views/QuestionsManagementView.vue')
+      component: () => import('../views/QuestionsManagementView.vue'),
+      meta: { requiresAuth: true }
     }
   ]
+})
+
+// Navigation guard for admin routes
+router.beforeEach((to, from, next) => {
+  if (to.meta?.requiresAuth && !AuthStorageService.isAuthenticated()) {
+    next({ path: '/admin' })
+  } else {
+    next()
+  }
 })
 
 export default router

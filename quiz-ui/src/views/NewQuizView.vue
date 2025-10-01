@@ -54,7 +54,7 @@ const playerName = ref('')
 const startQuiz = () => {
   if (playerName.value.trim()) {
     ParticipationStorageService.savePlayerName(playerName.value.trim())
-    router.push('/questions')
+    router.push('/quiz')
   }
 }
 </script>

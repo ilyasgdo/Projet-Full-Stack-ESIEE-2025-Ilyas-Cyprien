@@ -61,22 +61,23 @@
       </Card>
 
       <!-- Mobile Cards -->
-      <div v-if="scores.length > 0" class="space-y-4 sm:hidden">
-        <Card v-for="(score, index) in scores" :key="index">
+      <div v-if="scores.length > 0" class="space-y-4 sm:hidden" role="list" aria-label="Liste des meilleurs scores">
+        <Card v-for="(score, index) in scores" :key="index" role="listitem" :aria-label="`Rang ${index + 1}, ${score.playerName}, Score ${score.score}`">
           <CardContent class="p-4">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center space-x-3">
                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
-                      :class="getRankClass(index)">
+                      :class="getRankClass(index)"
+                      :aria-label="`Rang ${index + 1}`">
                   {{ index + 1 }}
                 </span>
                 <span class="font-medium text-foreground">{{ score.playerName }}</span>
               </div>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary" :aria-label="`Score ${score.score}`">
                 {{ score.score }}
               </span>
             </div>
-            <p class="text-sm text-muted-foreground">{{ score.date }}</p>
+            <p class="text-sm text-muted-foreground" :aria-label="`Date ${score.date}`">{{ score.date }}</p>
           </CardContent>
         </Card>
       </div>

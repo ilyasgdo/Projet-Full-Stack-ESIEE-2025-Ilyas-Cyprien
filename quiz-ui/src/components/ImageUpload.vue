@@ -1,36 +1,56 @@
 <template>
   <div class="space-y-2">
     <Label v-if="label">{{ label }}</Label>
+    <!-- Hidden file input always available -->
+    <input 
+      ref="fileInput" 
+      type="file" 
+      @change="handleFileChange" 
+      accept="image/*" 
+      class="hidden"
+    />
     
     <!-- Upload Area -->
     <div v-if="!imageDataUrl" 
          @click="triggerFileInput"
          class="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors">
-      <input 
-        ref="fileInput" 
-        type="file" 
-        @change="handleFileChange" 
-        accept="image/*" 
-        class="hidden"
-      />
       <Upload class="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
       <p class="text-sm text-muted-foreground mb-1">Cliquez pour sélectionner une image</p>
       <p class="text-xs text-muted-foreground">Formats acceptés: JPG, PNG, GIF (max 1MB)</p>
     </div>
     
     <!-- Preview Area -->
-    <div v-else class="relative">
-      <img :src="imageDataUrl" alt="Preview" class="max-w-full h-auto rounded-md border" />
-      <Button 
-        type="button" 
-        @click="removeImage" 
-        variant="destructive"
-        size="sm"
-        class="absolute top-2 right-2 gap-1"
-      >
-        <Trash2 class="h-3 w-3" />
-        Supprimer
-      </Button>
+    <div 
+      v-else 
+      class="relative w-full h-40 rounded-lg border bg-muted/10 overflow-hidden group"
+      @click="triggerFileInput"
+      title="Cliquez pour remplacer l'image"
+    >
+      <img 
+        :src="imageDataUrl" 
+        alt="Prévisualisation image" 
+        class="w-full h-full object-contain"
+      />
+      <div class="absolute top-2 right-2 flex gap-2">
+        <Button 
+          type="button"
+          size="sm"
+          variant="secondary"
+          @click.stop="triggerFileInput"
+        >
+          Remplacer
+        </Button>
+        <Button 
+          type="button" 
+          @click.stop="removeImage" 
+          variant="destructive"
+          size="sm"
+          class="gap-1"
+        >
+          <Trash2 class="h-3 w-3" />
+          Supprimer
+        </Button>
+      </div>
     </div>
     
     <!-- Error Message -->
@@ -115,7 +135,7 @@ const compressImage = (file) => {
     const ctx = canvas.getContext('2d')
     const img = new Image()
     
-    img.onload = () => {
+  img.onload = () => {
       // Calculate new dimensions (max 800px width/height)
       const maxSize = 800
       let { width, height } = img
@@ -132,14 +152,18 @@ const compressImage = (file) => {
         }
       }
       
-      canvas.width = width
-      canvas.height = height
-      
-      // Draw and compress
-      ctx.drawImage(img, 0, 0, width, height)
-      
-      // Convert to base64 with compression (0.8 quality for JPEG)
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8)
+    canvas.width = width
+    canvas.height = height
+    
+    // Fill background to avoid artifacts with transparent images converted to JPEG
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, width, height)
+    
+    // Draw and compress
+    ctx.drawImage(img, 0, 0, width, height)
+    
+    // Convert to base64 with compression (0.8 quality for JPEG)
+    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8)
       resolve(compressedBase64)
     }
     

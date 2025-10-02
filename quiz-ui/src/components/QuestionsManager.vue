@@ -42,6 +42,7 @@
           <QuestionDisplay 
             :current-question="currentQuestion"
             @click-on-answer="answerClickedHandler"
+            @request-next="nextQuestion"
           />
         </div>
 
@@ -51,6 +52,7 @@
             variant="ghost"
             @click="goHome"
             class="text-muted-foreground"
+            aria-label="Abandonner et retourner à l'accueil"
           >
             ← Abandonner
           </Button>
@@ -60,6 +62,8 @@
             :disabled="!selectedAnswer || submitting"
             size="lg"
             class="gap-2"
+            :aria-disabled="!selectedAnswer || submitting ? 'true' : 'false'"
+            :aria-label="submitting ? 'Envoi en cours' : (isLastQuestion ? 'Terminer le quiz' : 'Question suivante')"
           >
             <Loader2 v-if="submitting" class="h-4 w-4 animate-spin" />
             {{ submitting ? 'Envoi...' : (isLastQuestion ? 'Terminer' : 'Suivant') }}

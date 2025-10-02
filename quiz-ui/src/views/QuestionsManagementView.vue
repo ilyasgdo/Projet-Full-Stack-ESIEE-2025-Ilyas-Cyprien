@@ -1,14 +1,14 @@
 <template>
   <div class="py-8">
-    <div class="max-w-6xl mx-auto space-y-8">
+    <div class="max-w-6xl mx-auto space-y-8 px-4 sm:px-6 lg:px-0">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 class="text-3xl font-bold">Gestion des Questions</h1>
-        <div class="flex gap-2">
+        <h1 class="text-2xl sm:text-3xl font-bold">Gestion des Questions</h1>
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button 
             @click="showCreateModal = true" 
             :disabled="loading"
-            class="gap-2"
+            class="gap-2 w-full sm:w-auto"
           >
             <Plus class="h-4 w-4" />
             Nouvelle Question
@@ -17,7 +17,7 @@
             @click="confirmDeleteAll" 
             variant="destructive"
             :disabled="loading || questions.length === 0"
-            class="gap-2"
+            class="gap-2 w-full sm:w-auto"
           >
             <Trash2 class="h-4 w-4" />
             Supprimer Tout
@@ -45,7 +45,7 @@
       </div>
 
       <!-- Questions List -->
-      <div v-else class="grid gap-4">
+      <div v-else class="grid gap-4 sm:grid-cols-2">
         <Card 
           v-for="question in questions" 
           :key="question.id" 
@@ -92,12 +92,14 @@
           </CardHeader>
           
           <CardContent class="pt-0">
-            <div v-if="question.image" class="mb-4">
-              <img 
-                :src="question.image" 
-                alt="Question image" 
-                class="max-w-full h-auto rounded-md border"
-              />
+            <div v-if="isValidImageSource(question.image)" class="mb-4">
+              <div class="w-full h-40 sm:h-52 rounded-md border bg-muted/20 flex items-center justify-center overflow-hidden">
+                <img 
+                  :src="question.image" 
+                  alt="Question image" 
+                  class="max-h-full max-w-full object-contain"
+                />
+              </div>
             </div>
             <div class="grid gap-2">
               <div 
@@ -119,7 +121,7 @@
 
       <!-- Question Form Dialog -->
       <Dialog :open="showCreateModal || showEditModal" @update:open="closeModal">
-        <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent class="w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {{ editingQuestion ? 'Modifier la Question' : 'Nouvelle Question' }}
@@ -173,7 +175,7 @@
                   :key="index"
                   class="space-y-2"
                 >
-                  <div class="flex gap-2">
+                  <div class="flex flex-col sm:flex-row gap-2">
                     <Input 
                       v-model="answer.text" 
                       :placeholder="`Réponse ${index + 1}`"
@@ -327,6 +329,16 @@ const loadQuestions = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Helpers
+const isValidImageSource = (src) => {
+  if (!src || typeof src !== 'string') return false
+  const s = src.trim()
+  if (!s) return false
+  if (s.startsWith('data:image/')) return true
+  if (/^https?:\/\//.test(s)) return true
+  return false
 }
 
 const editQuestion = (question) => {

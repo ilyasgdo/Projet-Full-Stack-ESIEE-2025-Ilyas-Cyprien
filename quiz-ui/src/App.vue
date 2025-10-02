@@ -18,6 +18,7 @@ const isMenuOpen = ref(false)
           <router-link 
             to="/" 
             class="flex items-center space-x-2 text-xl font-bold text-foreground hover:text-primary transition-colors"
+            aria-label="Aller à l'accueil"
           >
             <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span class="text-primary-foreground font-bold text-sm">Q</span>
@@ -26,7 +27,7 @@ const isMenuOpen = ref(false)
           </router-link>
           
           <!-- Desktop Navigation -->
-          <nav class="hidden md:flex items-center space-x-1">
+          <nav class="hidden md:flex items-center space-x-1" role="navigation" aria-label="Navigation principale">
             <Button 
               variant="ghost" 
               as-child
@@ -50,17 +51,18 @@ const isMenuOpen = ref(false)
           <!-- Mobile Navigation -->
           <Sheet v-model:open="isMenuOpen">
             <SheetTrigger as-child>
-              <Button variant="ghost" size="icon" class="md:hidden">
+              <Button variant="ghost" size="icon" class="md:hidden" aria-haspopup="dialog" aria-controls="mobile-menu" aria-label="Ouvrir le menu">
                 <Menu class="h-5 w-5" />
                 <span class="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" class="w-[300px] sm:w-[400px]">
-              <nav class="flex flex-col space-y-4 mt-6">
+            <SheetContent side="right" class="w-[300px] sm:w-[400px]" id="mobile-menu" role="dialog" aria-label="Menu mobile">
+              <nav class="flex flex-col space-y-4 mt-6" role="navigation" aria-label="Navigation mobile">
                 <router-link 
                   to="/" 
                   @click="isMenuOpen = false"
                   class="flex items-center space-x-2 text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
+                  aria-label="Aller à l'accueil"
                 >
                   Accueil
                 </router-link>
@@ -68,6 +70,7 @@ const isMenuOpen = ref(false)
                   to="/admin" 
                   @click="isMenuOpen = false"
                   class="flex items-center space-x-2 text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
+                  aria-label="Aller à l'administration"
                 >
                   Administration
                 </router-link>
@@ -79,7 +82,7 @@ const isMenuOpen = ref(false)
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 container mx-auto px-4 lg:px-6 max-w-7xl">
+    <main id="main-content" tabindex="-1" class="flex-1 container mx-auto px-4 lg:px-6 max-w-7xl" role="main">
       <router-view />
     </main>
 

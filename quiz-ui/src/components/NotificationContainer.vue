@@ -7,6 +7,7 @@
           :key="notification.id"
           :class="getNotificationClasses(notification.type)"
           class="p-4 rounded-lg shadow-lg border flex items-start gap-3 min-w-0"
+          :data-testid="`notification-${notification.type}`"
         >
           <!-- Icon -->
           <div class="flex-shrink-0 mt-0.5">

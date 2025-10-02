@@ -1,8 +1,8 @@
 <template>
   <div class="py-8">
     <div class="max-w-4xl mx-auto">
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center">
+      <!-- Loading State (only before first question) -->
+      <div v-if="loading && !currentQuestion" class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
         <p class="text-muted-foreground">Chargement des questions...</p>
       </div>
@@ -37,11 +37,13 @@
           </div>
         </div>
 
-        <!-- Question Display Component -->
-        <QuestionDisplay 
-          :current-question="currentQuestion"
-          @click-on-answer="answerClickedHandler"
-        />
+        <!-- Question Display Component with Animation Container -->
+        <div ref="questionContainer" class="question-container">
+          <QuestionDisplay 
+            :current-question="currentQuestion"
+            @click-on-answer="answerClickedHandler"
+          />
+        </div>
 
         <!-- Navigation -->
         <div class="flex justify-between items-center">
@@ -77,8 +79,12 @@ import QuestionDisplay from '@/components/QuestionDisplay.vue'
 import QuizApiService from '@/services/QuizApiService'
 import NotificationService from '@/services/NotificationService'
 import ParticipationStorageService from '@/services/ParticipationStorageService'
+import { gsap } from 'gsap'
 
 const router = useRouter()
+
+// Refs
+const questionContainer = ref(null)
 
 // State
 const currentQuestion = ref(null)
@@ -125,10 +131,32 @@ const loadQuizInfo = async () => {
 
 const loadQuestionByPosition = async (position) => {
   loading.value = true
+  
+  // Animate out current question with smooth slide
+  if (currentQuestion.value && questionContainer.value) {
+    await gsap.to(questionContainer.value, {
+      autoAlpha: 0,
+      xPercent: -100,
+      duration: 0.45,
+      ease: 'power3.inOut'
+    })
+  }
+  
   try {
     const response = await QuizApiService.getQuestionByPosition(position)
     currentQuestion.value = response.data
     selectedAnswer.value = null
+    
+    // Animate in new question with smooth slide
+    if (questionContainer.value) {
+      gsap.set(questionContainer.value, { autoAlpha: 0, xPercent: 100 })
+      gsap.to(questionContainer.value, {
+        autoAlpha: 1,
+        xPercent: 0,
+        duration: 0.5,
+        ease: 'power3.inOut'
+      })
+    }
   } catch (error) {
     console.error('Failed to load question:', error)
     NotificationService.handleApiError(error)
@@ -140,6 +168,7 @@ const loadQuestionByPosition = async (position) => {
 
 const answerClickedHandler = (answerIndex) => {
   selectedAnswer.value = answerIndex
+  // No zoom or flashy effects on selection per request
 }
 
 const nextQuestion = async () => {
@@ -180,3 +209,11 @@ const goHome = () => {
   router.push('/')
 }
 </script>
+
+<style scoped>
+.question-container {
+  transform-origin: center;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+</style>

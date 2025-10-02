@@ -71,6 +71,7 @@
                   size="sm"
                   :disabled="loading"
                   class="gap-2"
+                  data-testid="edit-question"
                 >
                   <Edit class="h-4 w-4" />
                   Modifier
@@ -81,6 +82,7 @@
                   size="sm"
                   :disabled="loading"
                   class="gap-2 text-destructive hover:text-destructive"
+                  data-testid="delete-question"
                 >
                   <Trash2 class="h-4 w-4" />
                   Supprimer
@@ -232,7 +234,7 @@
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction @click="executeDelete" :disabled="deleting" class="gap-2">
+            <AlertDialogAction @click="executeDelete" :disabled="deleting" class="gap-2" data-testid="confirm-delete">
               <Loader2 v-if="deleting" class="h-4 w-4 animate-spin" />
               <Trash2 v-else class="h-4 w-4" />
               {{ deleting ? 'Suppression...' : 'Supprimer' }}

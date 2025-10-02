@@ -12,13 +12,18 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open"
   },
   "dependencies": {
     "@vueuse/core": "^13.9.0",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gsap": "^3.13.0",
     "lucide-vue-next": "^0.544.0",
     "reka-ui": "^2.5.1",
     "shadcn-vue": "^2.2.0",
@@ -32,6 +37,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.21",
+    "cypress": "^15.3.0",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.6",
     "vite": "^7.0.6",

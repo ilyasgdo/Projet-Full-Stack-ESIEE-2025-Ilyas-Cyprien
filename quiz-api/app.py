@@ -21,6 +21,15 @@ app.config['MAX_IMAGE_SIZE_BYTES'] = 1024 * 1024  # 1MB
 # Initialize database
 db.init_app(app)
 
+# Request size validation middleware
+@app.before_request
+def check_request_size():
+    """Check if request size exceeds 1MB limit"""
+    if request.content_length and request.content_length > app.config['MAX_IMAGE_SIZE_BYTES']:
+        return jsonify({
+            "error": "Request too large. Maximum size allowed is 1MB."
+        }), 413
+
 @app.route('/')
 def hello_world():
     return jsonify({

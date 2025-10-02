@@ -3,7 +3,9 @@
     <div class="max-w-2xl mx-auto">
       <Card class="p-8 text-center">
         <div class="mb-6">
-          <div class="text-6xl mb-4">🎉</div>
+          <div class="text-6xl mb-4">
+            <span ref="partyEmoji" class="party-emoji" aria-hidden="true">🎉</span>
+          </div>
           <h1 class="text-3xl font-bold mb-2">Quiz Terminé !</h1>
           <p class="text-lg text-muted-foreground">Félicitations {{ playerName }}</p>
         </div>
@@ -66,6 +68,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { gsap } from 'gsap'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -75,6 +78,7 @@ import QuizApiService from '@/services/QuizApiService'
 const router = useRouter()
 const participationScore = ref(null)
 const playerName = ref('')
+const partyEmoji = ref(null)
 
 onMounted(() => {
   participationScore.value = ParticipationStorageService.getParticipationScore()
@@ -83,6 +87,17 @@ onMounted(() => {
   if (!participationScore.value || !playerName.value) {
     router.push('/')
   }
+  // Gentle left-right wave for the party emoji
+  if (partyEmoji.value) {
+    gsap.to(partyEmoji.value, {
+      rotation: 15,
+      duration: 1,
+      transformOrigin: '30% 70%',
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut'
+    })
+  }
 })
 
 const playAgain = () => {
@@ -90,3 +105,10 @@ const playAgain = () => {
   router.push('/new-quiz')
 }
 </script>
+
+<style scoped>
+.party-emoji {
+  display: inline-block;
+  will-change: transform;
+}
+</style>

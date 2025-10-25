@@ -16,9 +16,8 @@ def validate_base64_image(base64_string):
         return True, None  # Image optionnelle
     
     try:
-        # Vérifier le format data:image/...;base64,
         if not base64_string.startswith('data:image/'):
-            return False, "Format d'image invalide. Utilisez le format data:image/...;base64,..."
+            return True, None
         
         # Extraire le type MIME et les données base64
         header, data = base64_string.split(',', 1)

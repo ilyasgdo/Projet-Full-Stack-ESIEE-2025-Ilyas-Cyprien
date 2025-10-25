@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from models import db, Question, Answer, Participation, AdminSession
 from auth import generate_token, token_required
 from validation import validate_base64_image
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 CORS(app)
@@ -14,12 +15,31 @@ CORS(app)
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'iloveflask')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
+# Always store DB inside Flask instance folder to avoid cwd-dependent paths
+instance_path = app.instance_path
+os.makedirs(instance_path, exist_ok=True)
+db_path = os.path.join(instance_path, 'quiz.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_IMAGE_SIZE_BYTES'] = 1024 * 1024  # 1MB
 
 # Initialize database
 db.init_app(app)
+
+# Ensure JSON errors instead of default HTML pages
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    response = jsonify({
+        "error": e.description,
+        "code": e.code
+    })
+    return response, e.code
+
+@app.errorhandler(Exception)
+def handle_unexpected_exception(e):
+    return jsonify({
+        "error": "Internal server error"
+    }), 500
 
 # Request size validation middleware
 @app.before_request

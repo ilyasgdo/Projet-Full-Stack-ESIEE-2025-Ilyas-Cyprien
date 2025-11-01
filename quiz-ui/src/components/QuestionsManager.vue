@@ -20,7 +20,7 @@
       <!-- Quiz Content -->
       <div v-else-if="currentQuestion">
         <!-- Progress Bar -->
-        <div class="mb-8">
+        <div class="mb-8 glass-card p-4">
           <div class="flex justify-between items-center mb-2">
             <span class="text-sm text-muted-foreground">
               Question {{ currentPosition }} sur {{ totalQuestions || '?' }}
@@ -29,9 +29,9 @@
               {{ Math.round(progressPercentage) }}%
             </span>
           </div>
-          <div class="w-full bg-secondary rounded-full h-2">
+          <div class="w-full bg-secondary/50 rounded-full h-2 border border-primary/20">
             <div 
-              class="bg-primary h-2 rounded-full transition-all duration-300"
+              class="bg-primary h-2 rounded-full transition-all duration-300 shadow-[0_0_16px_rgba(59,130,246,0.45)]"
               :style="{ width: progressPercentage + '%' }"
             ></div>
           </div>

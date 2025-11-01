@@ -157,3 +157,68 @@ Dependencies & context:
 
 Notes:
 - Consider adding a small template lint rule or test to catch malformed tags earlier.
+
+---
+
+Fix quiz page parse error (QuestionDisplay.vue)
+
+State (before):
+- Quiz page failed to render; Vite overlay showed “Element is missing end tag”.
+- Source: `src/components/QuestionDisplay.vue:2:3` on `<Card class="mb-6">`.
+
+Objective:
+- Restore quiz page by fixing template structure without changing behavior.
+
+Steps:
+1) Add missing closing tag for first Card.
+   - File: `src/components/QuestionDisplay.vue`
+   - Change: Insert `</Card>` after `</CardContent>` before the second Card.
+2) Validate in browser.
+   - Dev server: `npm run dev` → `http://localhost:5174/`.
+   - Result: Overlay cleared, quiz page renders.
+
+Impact:
+- Quiz page displays again; interactions preserved.
+- No backend/API changes; purely template correction.
+
+Dependencies & context:
+- Vue SFC parsing, shadcn card components.
+- PRD unaffected; visual setup maintained.
+
+---
+
+Quiz UI polish (QuestionDisplay + QuestionsManager)
+
+Etat (avant):
+- UI fonctionnelle mais basique sur l’affichage de question et la barre de progression.
+
+Objectif:
+- Moderniser l’UI du quiz avec glassmorphism, gradients, glow et hover motion.
+
+Etapes réalisées:
+1) QuestionDisplay — carte et titre.
+   - Fichier: `src/components/QuestionDisplay.vue`
+   - Résumé: Ajout `glass-card` sur `<Card>`; `text-gradient` sur `<h2>` du titre.
+2) QuestionDisplay — boutons de réponses.
+   - Fichier: `src/components/QuestionDisplay.vue`
+   - Résumé: Ajout `hover-float`, `hover-glow` et `shadow-[0_0_12px_rgba(59,130,246,0.45)]` sur les réponses; glow du bullet radio synchronisé avec l’état sélectionné.
+3) QuestionDisplay — suppression du doublon d’affichage des réponses.
+   - Fichier: `src/components/QuestionDisplay.vue`
+   - Résumé: Retrait d’une carte duplicative pour ne garder qu’une seule source (`currentQuestion.possibleAnswers`).
+4) QuestionsManager — barre de progression.
+   - Fichier: `src/components/QuestionsManager.vue`
+   - Résumé: Conteneur en `glass-card p-4`; piste `bg-secondary/50 + border border-primary/20`; portion remplie avec glow `shadow-[0_0_16px_rgba(59,130,246,0.45)]`.
+5) Preview et validation visuelle.
+   - Dev server: `http://localhost:5174/` ouvert.
+   - Résultat: Rendu OK, sans overlay.
+
+Impact:
+- Lecture améliorée, ressenti premium et moderne; aucune logique modifiée.
+- Composants et contrats de données inchangés (`currentQuestion.possibleAnswers`).
+
+Dépendances & contexte:
+- Utilitaires Tailwind personnalisés disponibles (`glass-card`, `hover-glow`, `hover-float`, `text-gradient`).
+- Aligné PRD: modifications strictement UI.
+
+Notes:
+- Prochaine itération possible: feedback correct/incorrect (vert/rouge) post-sélection.

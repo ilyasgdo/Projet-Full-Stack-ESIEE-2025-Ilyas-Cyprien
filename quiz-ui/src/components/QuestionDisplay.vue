@@ -1,7 +1,7 @@
 <template>
-  <Card class="mb-6">
+  <Card class="mb-6 glass-card">
     <CardContent class="p-6">
-      <h2 class="text-xl font-semibold mb-6">{{ currentQuestion.title }}</h2>
+      <h2 class="text-xl font-semibold mb-6 text-gradient">{{ currentQuestion.title }}</h2>
       
       <img 
         v-if="validImageSrc && !imageHasError" 
@@ -30,9 +30,9 @@
           @keydown.shift.tab="handleShiftTab(idx, $event)"
           variant="ghost"
           :class="[
-            'w-full p-4 text-left rounded-lg border transition-all duration-200 h-auto justify-start',
+            'w-full p-4 text-left rounded-lg border transition-all duration-200 h-auto justify-start hover-float hover-glow',
             selectedAnswer === (idx + 1)
-              ? 'border-primary bg-primary/10 text-primary'
+              ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
               : 'border-border hover:border-primary/50 hover:bg-accent'
           ]"
           role="radio"
@@ -44,7 +44,7 @@
               :class="[
                 'w-4 h-4 rounded-full border-2 mr-3 transition-all',
                 selectedAnswer === (idx + 1)
-                  ? 'border-primary bg-primary'
+                  ? 'border-primary bg-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
                   : 'border-border'
               ]"
               aria-hidden="true"
@@ -54,36 +54,8 @@
         </Button>
       </div>
     </CardContent>
-    <Card class="glass-card">
-        <CardContent>
-          <div class="space-y-4">
-            <Button
-              v-for="(answer, idx) in currentQuestion.answers"
-              :key="idx"
-              class="w-full justify-start hover-glow hover-float"
-              @click="$emit('click-on-answer', idx + 1)"
-              :aria-label="`Réponse ${idx + 1}`"
-              role="radio"
-              :aria-checked="selectedAnswer === (idx + 1) ? 'true' : 'false'"
-              :tabindex="focusedIndex === idx ? 0 : -1"
-            >
-              <div class="flex items-center">
-                <div 
-                  :class="[
-                    'w-4 h-4 rounded-full border-2 mr-3 transition-all',
-                    selectedAnswer === (idx + 1)
-                      ? 'border-primary bg-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
-                       : 'border-border'
-                  ]"
-                  aria-hidden="true"
-                ></div>
-                {{ answer.text }}
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </template>
+  </Card>
+</template>
     
     <script setup>
     import { ref, watch, computed, nextTick } from 'vue'

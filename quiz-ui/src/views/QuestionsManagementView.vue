@@ -3,7 +3,7 @@
     <div class="max-w-6xl mx-auto space-y-8 px-4 sm:px-6 lg:px-0">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 class="text-2xl sm:text-3xl font-bold">Gestion des Questions</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gradient">Gestion des Questions</h1>
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button 
             @click="showCreateModal = true" 

@@ -1,11 +1,11 @@
 <template>
   <div class="py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-0">
-      <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Administration</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gradient">Administration</h1>
 
       <!-- Login Form -->
       <div v-if="!isAuthenticated">
-        <Card class="max-w-md mx-auto">
+        <Card class="max-w-md mx-auto glass-card">
           <CardHeader>
             <CardTitle class="text-center">Connexion Administrateur</CardTitle>
           </CardHeader>
@@ -38,7 +38,7 @@
       <div v-else class="space-y-8">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 class="text-2xl font-semibold">Tableau de bord</h2>
-          <Button variant="ghost" as-child>
+          <Button variant="ghost" as-child class="hover-float hover-glow">
             <button @click="logout" aria-label="Se déconnecter">
               Déconnexion
             </button>

@@ -60,3 +60,39 @@ Dépendances et contexte
 Prochaines étapes
 - Harmoniser les variantes `Button` secondaires (`outline`, `link`) avec `hover-float`.
 - Passer un coup de profilage Lighthouse (perf/acc) si nécessaire.
+
+---
+
+Amélioration high-tech (post-optimisation UI)
+
+Etat (avant):
+- UI homogène; encore perfectible pour un rendu très high-tech global.
+
+Objectif:
+- Étendre les effets high-tech au fond global et aux titres clés.
+
+Etapes réalisées:
+1) Fond global high-tech (tech grid) + branding en gradient.
+   - Fichier: `src/App.vue`
+   - Résumé: Ajout `bg-tech-grid` sur root; "Quiz App" en `text-gradient`; nav boutons `hover-float`.
+2) Titres clés en gradient.
+   - Fichiers: `ScoreView.vue`, `NewQuizView.vue`, `AdminView.vue`, `QuestionsManagementView.vue`
+   - Résumé: Ajout `text-gradient` aux H1/H2 principaux.
+3) CTA accueil + carte vide modernisés.
+   - Fichier: `HomeView.vue`
+   - Résumé: CTA avec `hover-glow` en plus; carte "aucun score" en `glass-card p-6`; sous-titre "Meilleurs Scores" en `text-gradient`.
+4) Preview et validation visuelle.
+   - Résumé: Dev server sur `http://localhost:5174/` ouvert; rendu sans erreur.
+
+Impact:
+- Perception "hyper high-tech" renforcée (fond technique, titres en gradient, CTA lumineux).
+- Cohérence de design accrue sans changement fonctionnel.
+
+Dépendances / contexte:
+- Tailwind utilitaires déjà présents (`glass-card`, `hover-glow`, `hover-float`, `bg-tech-grid`).
+- Aucune modification API; compatibilité conservée.
+
+Prochaines étapes suggérées:
+- Ajouter micro-animations sur icons (e.g., `lucide` avec `animate-pulse` léger au survol).
+- Uniformiser les headers des `Card` avec un léger `bg-gradient-to-r`.
+- Évaluer dark-mode fine-tuning (opacités, borders) si besoin.

@@ -4,7 +4,7 @@
     <div class="text-center mb-12">
       <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent drop-shadow-[0_2px_10px_rgba(59,130,246,0.25)]">Bienvenue au Quiz</h1>
       <p class="text-xl text-muted-foreground mb-8">Testez vos connaissances et défiez-vous !</p>
-      <Button variant="gradient" as-child size="lg" class="text-lg px-8 py-3 shadow-lg shadow-primary/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.45)] hover:-translate-y-[1px] hover-float transition-all duration-300">
+      <Button variant="gradient" as-child size="lg" class="text-lg px-8 py-3 shadow-lg shadow-primary/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.45)] hover:-translate-y-[1px] hover-float hover-glow transition-all duration-300">
         <router-link to="/new-quiz">
           Participer au Quiz
         </router-link>
@@ -13,7 +13,7 @@
 
     <!-- Scores Section -->
     <div class="max-w-4xl mx-auto">
-      <h2 class="text-2xl font-bold text-center mb-8">🏆 Meilleurs Scores</h2>
+      <h2 class="text-2xl font-bold text-center mb-8 text-gradient">🏆 Meilleurs Scores</h2>
       
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-8">
@@ -22,7 +22,7 @@
       </div>
 
       <!-- No Scores Message -->
-      <Card v-else-if="scores.length === 0" class="text-center py-12">
+      <Card v-else-if="scores.length === 0" class="text-center py-12 glass-card p-6">
         <p class="text-muted-foreground">Aucun score disponible pour le moment.</p>
         <p class="text-sm text-muted-foreground mt-2">Soyez le premier à jouer !</p>
       </Card>

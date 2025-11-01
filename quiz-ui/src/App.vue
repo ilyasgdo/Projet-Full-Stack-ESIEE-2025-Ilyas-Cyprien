@@ -9,7 +9,7 @@ const isMenuOpen = ref(false)
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-background">
+  <div id="app" class="min-h-screen bg-background bg-tech-grid">
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/10 via-background/80 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/20">
       <div class="container mx-auto px-4 lg:px-6">
@@ -23,7 +23,7 @@ const isMenuOpen = ref(false)
             <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center justify-center">
               <span class="text-primary-foreground font-bold text-sm">Q</span>
             </div>
-            <span class="hidden sm:inline-block">Quiz App</span>
+            <span class="hidden sm:inline-block text-gradient">Quiz App</span>
           </router-link>
           
           <!-- Desktop Navigation -->
@@ -31,7 +31,7 @@ const isMenuOpen = ref(false)
             <Button 
               variant="ghost" 
               as-child
-              class="text-sm font-medium"
+              class="text-sm font-medium hover-float"
             >
               <router-link to="/">
                 Accueil
@@ -40,7 +40,7 @@ const isMenuOpen = ref(false)
             <Button 
               variant="ghost" 
               as-child
-              class="text-sm font-medium"
+              class="text-sm font-medium hover-float"
             >
               <router-link to="/admin">
                 Administration

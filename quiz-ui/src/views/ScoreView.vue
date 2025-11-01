@@ -6,7 +6,7 @@
           <div class="text-6xl mb-4">
             <span ref="partyEmoji" class="party-emoji" aria-hidden="true">🎉</span>
           </div>
-          <h1 class="text-3xl font-bold mb-2">Quiz Terminé !</h1>
+          <h1 class="text-3xl font-bold mb-2 text-gradient">Quiz Terminé !</h1>
           <p class="text-lg text-muted-foreground">Félicitations {{ playerName }}</p>
         </div>
 

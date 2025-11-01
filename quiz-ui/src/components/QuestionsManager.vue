@@ -12,9 +12,9 @@
         <div class="text-6xl mb-4">❌</div>
         <h2 class="text-2xl font-bold mb-2">Erreur</h2>
         <p class="text-destructive mb-6">Erreur lors du chargement de la question</p>
-        <Button variant="outline" @click="goHome">
-          Retour à l'accueil
-        </Button>
+        <Button variant="outline" @click="goHome" class="hover-float">
+               Retour à l'accueil
+             </Button>
       </div>
 
       <!-- Quiz Content -->
@@ -51,7 +51,7 @@
           <Button
             variant="ghost"
             @click="goHome"
-            class="text-muted-foreground"
+            class="text-muted-foreground hover-float"
             aria-label="Abandonner et retourner à l'accueil"
           >
             ← Abandonner
@@ -61,7 +61,8 @@
             @click="nextQuestion"
             :disabled="!selectedAnswer || submitting"
             size="lg"
-            class="gap-2"
+            class="gap-2 hover-float hover-glow"
+            variant="gradient"
             :aria-disabled="!selectedAnswer || submitting ? 'true' : 'false'"
             :aria-label="submitting ? 'Envoi en cours' : (isLastQuestion ? 'Terminer le quiz' : 'Question suivante')"
           >

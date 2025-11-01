@@ -1,7 +1,7 @@
 <template>
   <div class="py-8">
     <div class="max-w-md mx-auto">
-      <Card class="p-6">
+      <Card class="glass-card p-6">
         <h1 class="text-2xl font-bold mb-6 text-center">Nouveau Quiz</h1>
         
         <form @submit.prevent="startQuiz">
@@ -22,7 +22,8 @@
           <Button
             type="submit"
             :disabled="!playerName.trim()"
-            class="w-full"
+            variant="gradient"
+            class="w-full hover-float hover-glow"
             size="lg"
           >
             Commencer le Quiz

@@ -2,9 +2,9 @@
   <div class="py-8">
     <!-- Hero Section -->
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold mb-4">Bienvenue au Quiz</h1>
+      <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent drop-shadow-[0_2px_10px_rgba(59,130,246,0.25)]">Bienvenue au Quiz</h1>
       <p class="text-xl text-muted-foreground mb-8">Testez vos connaissances et défiez-vous !</p>
-      <Button as-child size="lg" class="text-lg px-8 py-3">
+      <Button variant="gradient" as-child size="lg" class="text-lg px-8 py-3 shadow-lg shadow-primary/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.45)] hover:-translate-y-[1px] hover-float transition-all duration-300">
         <router-link to="/new-quiz">
           Participer au Quiz
         </router-link>
@@ -28,56 +28,54 @@
       </Card>
 
       <!-- Desktop Table -->
-      <Card v-if="scores.length > 0" class="hidden sm:block">
-        <Table>
-          <TableHeader>
+<Card v-if="scores.length > 0" class="hidden sm:block glass-card">
+       <Table>
+          <TableHeader class="bg-gradient-to-r from-primary/10 to-accent/10">
             <TableRow>
               <TableHead class="w-20">Rang</TableHead>
               <TableHead>Joueur</TableHead>
               <TableHead>Score</TableHead>
-              <TableHead class="text-right">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="(score, index) in scores" :key="index">
+            <TableRow v-for="(score, index) in scores" :key="index" class="hover:bg-muted/50 transition-all">
               <TableCell class="font-medium">
-                <div class="flex items-center">
-                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
-                        :class="getRankClass(index)">
-                    {{ index + 1 }}
-                  </span>
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
+                      :class="getRankClass(index)"
+                      :aria-label="`Rang ${index + 1}`">
+                  {{ index + 1 }}
+                </span>
+              </TableCell>
+              <TableCell>
+                <div class="flex items-center space-x-3">
+                  <span class="font-medium text-foreground">{{ score.playerName }}</span>
                 </div>
               </TableCell>
-              <TableCell class="font-medium">{{ score.playerName }}</TableCell>
               <TableCell>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary hover-glow" :aria-label="`Score ${score.score}`">
                   {{ score.score }}
                 </span>
               </TableCell>
-              <TableCell class="text-right text-muted-foreground">{{ score.date }}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Card>
 
       <!-- Mobile Cards -->
-      <div v-if="scores.length > 0" class="space-y-4 sm:hidden" role="list" aria-label="Liste des meilleurs scores">
-        <Card v-for="(score, index) in scores" :key="index" role="listitem" :aria-label="`Rang ${index + 1}, ${score.playerName}, Score ${score.score}`">
-          <CardContent class="p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center space-x-3">
-                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
-                      :class="getRankClass(index)"
-                      :aria-label="`Rang ${index + 1}`">
-                  {{ index + 1 }}
-                </span>
-                <span class="font-medium text-foreground">{{ score.playerName }}</span>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary" :aria-label="`Score ${score.score}`">
-                {{ score.score }}
+      <div v-if="scores.length > 0" class="sm:hidden space-y-4">
+        <Card v-for="(score, index) in scores" :key="index" class="p-4 hover-glow glass-card">
+          <CardContent class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
+                    :class="getRankClass(index)"
+                    :aria-label="`Rang ${index + 1}`">
+                {{ index + 1 }}
               </span>
+              <span class="font-medium text-foreground">{{ score.playerName }}</span>
             </div>
-            <p class="text-sm text-muted-foreground" :aria-label="`Date ${score.date}`">{{ score.date }}</p>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary" :aria-label="`Score ${score.score}`">
+              {{ score.score }}
+            </span>
           </CardContent>
         </Card>
       </div>

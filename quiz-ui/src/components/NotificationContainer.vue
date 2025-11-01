@@ -6,7 +6,7 @@
           v-for="notification in notifications"
           :key="notification.id"
           :class="getNotificationClasses(notification.type)"
-          class="p-4 rounded-lg shadow-lg border flex items-start gap-3 min-w-0"
+          class="p-4 rounded-lg shadow-lg border flex items-start gap-3 min-w-0 backdrop-blur bg-background/90"
           :data-testid="`notification-${notification.type}`"
         >
           <!-- Icon -->
@@ -45,18 +45,18 @@ const { notifications: notificationsList } = useNotifications()
 const notifications = computed(() => notificationsList)
 
 const getNotificationClasses = (type) => {
-  const baseClasses = 'bg-white border-l-4'
+  const baseClasses = 'border-l-4 border border-border/40 glass-card'
   
   switch (type) {
     case 'success':
-      return `${baseClasses} border-l-green-500 text-green-800`
+      return `${baseClasses} border-l-green-500 text-green-700`
     case 'error':
-      return `${baseClasses} border-l-red-500 text-red-800`
+      return `${baseClasses} border-l-red-500 text-red-700`
     case 'warning':
-      return `${baseClasses} border-l-yellow-500 text-yellow-800`
+      return `${baseClasses} border-l-yellow-500 text-yellow-700`
     case 'info':
     default:
-      return `${baseClasses} border-l-blue-500 text-blue-800`
+      return `${baseClasses} border-l-blue-500 text-blue-700`
   }
 }
 </script>

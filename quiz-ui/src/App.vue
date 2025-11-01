@@ -11,7 +11,7 @@ const isMenuOpen = ref(false)
 <template>
   <div id="app" class="min-h-screen bg-background">
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/10 via-background/80 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/20">
       <div class="container mx-auto px-4 lg:px-6">
         <div class="flex h-16 items-center justify-between">
           <!-- Logo -->
@@ -20,7 +20,7 @@ const isMenuOpen = ref(false)
             class="flex items-center space-x-2 text-xl font-bold text-foreground hover:text-primary transition-colors"
             aria-label="Aller à l'accueil"
           >
-            <div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+            <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center justify-center">
               <span class="text-primary-foreground font-bold text-sm">Q</span>
             </div>
             <span class="hidden sm:inline-block">Quiz App</span>

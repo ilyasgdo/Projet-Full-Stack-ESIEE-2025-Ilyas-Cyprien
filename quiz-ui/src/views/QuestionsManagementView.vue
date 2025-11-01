@@ -8,7 +8,8 @@
           <Button 
             @click="showCreateModal = true" 
             :disabled="loading"
-            class="gap-2 w-full sm:w-auto"
+            variant="gradient"
+            class="gap-2 w-full sm:w-auto hover-float hover-glow"
           >
             <Plus class="h-4 w-4" />
             Nouvelle Question
@@ -17,7 +18,7 @@
             @click="confirmDeleteAll" 
             variant="destructive"
             :disabled="loading || questions.length === 0"
-            class="gap-2 w-full sm:w-auto"
+            class="gap-2 w-full sm:w-auto hover-float"
           >
             <Trash2 class="h-4 w-4" />
             Supprimer Tout
@@ -38,7 +39,7 @@
         </div>
         <h3 class="text-xl font-semibold mb-2">Aucune question</h3>
         <p class="text-muted-foreground mb-6">Commencez par créer votre première question pour le quiz.</p>
-        <Button @click="showCreateModal = true" class="gap-2">
+        <Button @click="showCreateModal = true" variant="gradient" class="gap-2 hover-float hover-glow">
           <Plus class="h-4 w-4" />
           Créer une question
         </Button>
@@ -49,7 +50,7 @@
         <Card 
           v-for="question in questions" 
           :key="question.id" 
-          class="overflow-hidden"
+          class="glass-card overflow-hidden"
         >
           <CardHeader class="pb-3">
             <div class="flex items-start justify-between gap-4">
@@ -70,7 +71,7 @@
                   variant="outline"
                   size="sm"
                   :disabled="loading"
-                  class="gap-2"
+                  class="gap-2 hover-float"
                   data-testid="edit-question"
                 >
                   <Edit class="h-4 w-4" />
@@ -81,7 +82,7 @@
                   variant="outline"
                   size="sm"
                   :disabled="loading"
-                  class="gap-2 text-destructive hover:text-destructive"
+                  class="gap-2 text-destructive hover:text-destructive hover-float"
                   data-testid="delete-question"
                 >
                   <Trash2 class="h-4 w-4" />
@@ -210,7 +211,7 @@
               <Button type="button" @click="closeModal" variant="outline">
                 Annuler
               </Button>
-              <Button type="submit" :disabled="saving" class="gap-2">
+              <Button type="submit" :disabled="saving" variant="gradient" class="gap-2 hover-float hover-glow">
                 <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
                 <Save v-else class="h-4 w-4" />
                 {{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}

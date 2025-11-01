@@ -24,9 +24,9 @@
                 />
               </div>
               
-              <Button type="submit" class="w-full gap-2" size="lg" :disabled="loginLoading">
-                <Loader2 v-if="loginLoading" class="h-4 w-4 animate-spin" />
-                {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
+              <Button type="submit" variant="gradient" class="w-full gap-2 hover-float hover-glow" size="lg" :disabled="loginLoading">
+              <Loader2 v-if="loginLoading" class="h-4 w-4 animate-spin" />
+              {{ loginLoading ? 'Connexion...' : 'Se connecter' }}
               </Button>
               <p v-if="loginError" class="text-center text-sm text-destructive">{{ loginError }}</p>
             </form>
@@ -47,49 +47,48 @@
 
         <div class="grid gap-6 md:grid-cols-2">
           <!-- Questions Management -->
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Questions</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-              <p class="text-muted-foreground">
-                Gérez les questions du quiz, ajoutez de nouvelles questions ou modifiez les existantes.
-              </p>
-              <Button class="w-full sm:w-auto" aria-label="Gérer les questions">
-                <router-link to="/admin/questions">
-                  Gérer les Questions
-                </router-link>
-              </Button>
-            </CardContent>
-          </Card>
-
+          <Card class="glass-card">
+          <CardHeader class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-t-lg">
+            <CardTitle>Gestion des Questions</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <p class="text-muted-foreground">
+              Gérez les questions du quiz, ajoutez de nouvelles questions ou modifiez les existantes.
+            </p>
+                <Button variant="gradient" class="w-full sm:w-auto hover-float" aria-label="Gérer les questions">
+            <router-link to="/admin/questions">
+              Gérer les Questions
+            </router-link>
+          </Button>
+        </CardContent>
+      </Card>
+  
           <!-- Participations Management -->
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Participations</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-              <p class="text-muted-foreground">
-                Consultez les participations et gérez les scores des utilisateurs.
-              </p>
-              <div class="space-y-2">
-                <Button variant="outline" class="w-full sm:w-auto" aria-label="Voir les participations">
-                  Voir les Participations
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  @click="confirmDeleteParticipations"
-                  class="w-full sm:w-auto gap-2"
-                  :disabled="deletingParticipations"
-                  :aria-disabled="deletingParticipations ? 'true' : 'false'"
-                  aria-label="Supprimer toutes les participations"
-                >
-                  <Loader2 v-if="deletingParticipations" class="h-4 w-4 animate-spin" />
-                  {{ deletingParticipations ? 'Suppression...' : 'Supprimer Toutes les Participations' }}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <Card class="glass-card">
+          <CardHeader class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-t-lg">
+            <CardTitle>Gestion des Participations</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <p class="text-muted-foreground">
+              Consultez les participations et gérez les scores des utilisateurs.
+            </p>
+            <div class="space-y-2">
+                <Button variant="gradient" class="w-full sm:w-auto hover-float" aria-label="Voir les participations">
+            Voir les Participations
+          </Button>
+          <Button 
+            variant="destructive" 
+            @click="confirmDeleteParticipations"
+            class="w-full sm:w-auto gap-2 hover-float hover-glow"
+            :disabled="deletingParticipations"
+            :aria-disabled="deletingParticipations ? 'true' : 'false'"
+            aria-label="Supprimer toutes les participations"
+          >
+            <Loader2 v-if="deletingParticipations" class="h-4 w-4 animate-spin" />
+            {{ deletingParticipations ? 'Suppression...' : 'Supprimer Toutes les Participations' }}
+          </Button>
+        </div>
+      </Card>
         </div>
       </div>
     </div>

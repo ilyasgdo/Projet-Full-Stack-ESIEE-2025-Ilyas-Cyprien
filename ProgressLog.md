@@ -222,3 +222,40 @@ Dépendances & contexte:
 
 Notes:
 - Prochaine itération possible: feedback correct/incorrect (vert/rouge) post-sélection.
+
+---
+
+Ultra-modern quiz UI upgrade
+
+Etat (avant):
+- UI modernisée mais encore perfectible pour un rendu "ultra moderne".
+
+Objectif:
+- Pousser le style du quiz avec effets premium: anneau gradient, shine, gradient animé.
+
+Etapes réalisées:
+1) Nouvelles utilitaires CSS.
+   - Fichier: `src/style.css`
+   - Ajouts: `.ring-gradient`, `.animate-gradient-x`, `.ambient-shine`, `.with-gradient-underline`, `.tilt-hover`.
+2) QuestionDisplay — carte et titre.
+   - Fichier: `src/components/QuestionDisplay.vue`
+   - Résumé: `Card` en `glass-card ring-gradient tilt-hover`; titre avec `text-gradient + with-gradient-underline`.
+3) QuestionDisplay — interactions des réponses.
+   - Fichier: `src/components/QuestionDisplay.vue`
+   - Résumé: Boutons `ambient-shine`; bullet sélectionné avec anneau `ring-2 ring-primary/40`.
+4) QuestionsManager — barre de progression.
+   - Fichier: `src/components/QuestionsManager.vue`
+   - Résumé: Portion remplie avec `animate-gradient-x` (gradient en mouvement) + glow.
+5) Validation visuelle.
+   - Preview: `http://localhost:5174/` ouvert; rendu OK, pas d’erreur.
+
+Impact:
+- Rendu "ultra moderne" plus dynamique et premium (anneau gradient, shine, gradient animé).
+- Aucune modification de logique; uniquement visuel et accessible (focus conservé).
+
+Dépendances & contexte:
+- Tailwind + classes custom; shadcn-vue.
+- Aligné PRD: modifications strictement UI.
+
+Notes:
+- Ajuster l’intensité des glows si nécessaire (`rgba(..., 0.45 → 0.30)`).

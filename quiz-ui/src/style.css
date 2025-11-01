@@ -104,4 +104,77 @@
     background-size: auto, 24px 24px, auto, auto, auto;
     background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
   }
+
+  /* Ultra-modern utilities */
+  .tilt-hover {
+    @apply transform-gpu transition-transform duration-300 hover:-translate-y-[1px] hover:scale-[1.01];
+  }
+
+  .with-gradient-underline {
+    position: relative;
+  }
+  .with-gradient-underline::after {
+    content: "";
+    display: block;
+    height: 2px;
+    width: 64px;
+    margin-top: 8px;
+    border-radius: 9999px;
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+    opacity: 0.7;
+  }
+
+  .ring-gradient {
+    position: relative;
+  }
+  .ring-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--primary)/0.7), hsl(var(--secondary)/0.7), hsl(var(--accent)/0.7));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .animate-gradient-x {
+    background-image: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)), hsl(var(--primary)));
+    background-size: 200% 100%;
+    animation: gradient-x 8s ease infinite;
+  }
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .ambient-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .ambient-shine::after {
+    content: "";
+    position: absolute;
+    top: -150%;
+    bottom: -150%;
+    left: -50%;
+    width: 50%;
+    transform: rotate(25deg);
+    background: linear-gradient( to right, rgba(255,255,255,0.0), rgba(255,255,255,0.08), rgba(255,255,255,0.0) );
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ambient-shine:hover::after {
+    animation: shine-move 1.2s ease;
+    opacity: 1;
+  }
+  @keyframes shine-move {
+    from { left: -50%; }
+    to { left: 150%; }
+  }
 }

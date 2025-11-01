@@ -1,7 +1,7 @@
 <template>
-  <Card class="mb-6 glass-card">
+  <Card class="mb-6 glass-card ring-gradient tilt-hover">
     <CardContent class="p-6">
-      <h2 class="text-xl font-semibold mb-6 text-gradient">{{ currentQuestion.title }}</h2>
+      <h2 class="text-xl font-semibold mb-6 text-gradient with-gradient-underline">{{ currentQuestion.title }}</h2>
       
       <img 
         v-if="validImageSrc && !imageHasError" 
@@ -30,7 +30,7 @@
           @keydown.shift.tab="handleShiftTab(idx, $event)"
           variant="ghost"
           :class="[
-            'w-full p-4 text-left rounded-lg border transition-all duration-200 h-auto justify-start hover-float hover-glow',
+            'w-full p-4 text-left rounded-lg border transition-all duration-200 h-auto justify-start hover-float hover-glow ambient-shine',
             selectedAnswer === (idx + 1)
               ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
               : 'border-border hover:border-primary/50 hover:bg-accent'
@@ -44,7 +44,7 @@
               :class="[
                 'w-4 h-4 rounded-full border-2 mr-3 transition-all',
                 selectedAnswer === (idx + 1)
-                  ? 'border-primary bg-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
+                  ? 'border-primary bg-primary shadow-[0_0_12px_rgba(59,130,246,0.45)] ring-2 ring-primary/40'
                   : 'border-border'
               ]"
               aria-hidden="true"

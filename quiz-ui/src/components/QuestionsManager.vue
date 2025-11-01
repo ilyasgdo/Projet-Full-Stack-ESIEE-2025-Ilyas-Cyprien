@@ -31,7 +31,7 @@
           </div>
           <div class="w-full bg-secondary/50 rounded-full h-2 border border-primary/20">
             <div 
-              class="bg-primary h-2 rounded-full transition-all duration-300 shadow-[0_0_16px_rgba(59,130,246,0.45)]"
+              class="bg-primary animate-gradient-x h-2 rounded-full transition-all duration-300 shadow-[0_0_16px_rgba(59,130,246,0.45)]"
               :style="{ width: progressPercentage + '%' }"
             ></div>
           </div>

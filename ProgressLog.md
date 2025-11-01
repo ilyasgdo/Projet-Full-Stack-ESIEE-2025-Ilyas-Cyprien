@@ -96,3 +96,64 @@ Prochaines étapes suggérées:
 - Ajouter micro-animations sur icons (e.g., `lucide` avec `animate-pulse` léger au survol).
 - Uniformiser les headers des `Card` avec un léger `bg-gradient-to-r`.
 - Évaluer dark-mode fine-tuning (opacités, borders) si besoin.
+
+---
+
+Modern background upgrade
+
+State (before):
+- Global background used `bg-tech-grid` (static grid).
+
+Objective:
+- Make the background more modern with layered glows + subtle noise.
+
+Steps:
+1) Create `.bg-modern` layered utility.
+   - File: `src/style.css`
+   - Summary: Adds noise overlay, subtle grid, and primary/secondary/accent radial glows using theme HSL vars.
+2) Apply `.bg-modern` globally.
+   - File: `src/App.vue`
+   - Summary: Root container now uses `bg-modern`.
+3) Preview validation.
+   - Summary: Preview on `http://localhost:5174/` renders correctly; no browser errors.
+
+Impact:
+- Background feels more contemporary and premium without heavy animation.
+- Respects light/dark variables; integrates with existing theme tokens.
+
+Dependencies:
+- Tailwind layers, CSS variables in `:root` and `.dark`.
+- No backend/API changes.
+
+---
+
+Fix Vite error overlay (ScoreView.vue)
+
+State (before):
+- Vite error overlay visible on ScoreView due to malformed template.
+- Stray `class="font-semibold"` outside of any opening tag in detailed results.
+
+Objective:
+- Resolve the overlay by correcting the template block while keeping visuals intact.
+
+Steps:
+1) Patch detailed results markup.
+   - File: `src/views/ScoreView.vue`
+   - Change: Group status and label in a right-side container.
+   - New: `<div class="flex items-center gap-2">` wrapping two `<span>` elements.
+   - Summary: Valid HTML structure; same visual intent.
+2) Validate via preview.
+   - Command: `npm run dev`
+   - Preview: `http://localhost:5174/`
+   - Result: Overlay gone; page renders OK.
+
+Impact:
+- Restores ScoreView rendering and client-side navigation.
+- No API/logic changes; purely presentational fix.
+
+Dependencies & context:
+- Vite dev server, Vue template parser.
+- PRD unaffected; feature scope unchanged.
+
+Notes:
+- Consider adding a small template lint rule or test to catch malformed tags earlier.

@@ -93,4 +93,15 @@
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
+  .bg-modern {
+    background-color: hsl(var(--background));
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 2px),
+      radial-gradient(circle at 1px 1px, hsl(var(--ring)/0.06) 1px, transparent 0),
+      radial-gradient(900px 400px at 10% -10%, hsl(var(--primary)/0.18), transparent 65%),
+      radial-gradient(800px 400px at 90% 0%, hsl(var(--secondary)/0.14), transparent 70%),
+      radial-gradient(600px 300px at 50% 100%, hsl(var(--accent)/0.10), transparent 75%);
+    background-size: auto, 24px 24px, auto, auto, auto;
+    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+  }
 }

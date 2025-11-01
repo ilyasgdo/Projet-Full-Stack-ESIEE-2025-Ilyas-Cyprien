@@ -9,7 +9,7 @@ const isMenuOpen = ref(false)
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-background bg-tech-grid">
+  <div id="app" class="min-h-screen bg-modern">
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/10 via-background/80 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/20">
       <div class="container mx-auto px-4 lg:px-6">

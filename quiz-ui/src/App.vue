@@ -7,6 +7,7 @@ import NotificationContainer from '@/components/NotificationContainer.vue'
 import logo from '@/assets/logo.png'
 
 const isMenuOpen = ref(false)
+const currentYear = new Date().getFullYear()
 </script>
 
 <template>
@@ -88,8 +89,8 @@ const isMenuOpen = ref(false)
     <!-- Footer -->
     <footer class="border-t bg-muted/50 mt-auto">
       <div class="container mx-auto px-4 lg:px-6 py-4">
-        <div class="text-right text-sm text-muted-foreground">
-          <p>&copy; 2025</p>
+        <div class="text-center text-sm text-muted-foreground">
+          <p>&copy; {{ currentYear }} Qrious</p>
         </div>
       </div>
     </footer>

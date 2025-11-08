@@ -29,14 +29,9 @@
               >
                 <div class="flex items-center justify-between">
                   <span class="text-muted-foreground">Question {{ index + 1 }}</span>
-                  <div class="flex items-center gap-2">
-                    <span :class="summary.wasCorrect ? 'text-green-500' : 'text-red-500'">
-                      {{ summary.wasCorrect ? 'Correct' : 'Faux' }}
-                    </span>
-                    <span class="font-semibold">
-                      {{ summary.wasCorrect ? '✓ Correct' : '✗ Incorrect' }}
-                    </span>
-                  </div>
+                  <span :class="summary.wasCorrect ? 'text-green-500 font-semibold' : 'text-red-500 font-semibold'">
+                    {{ summary.wasCorrect ? '✓ Correct' : '✗ Incorrect' }}
+                  </span>
                 </div>
               </Card>
             </div>

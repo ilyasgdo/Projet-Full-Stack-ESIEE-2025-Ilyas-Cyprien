@@ -3,22 +3,18 @@ import axios from 'axios'
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
   json: true,
-  timeout: 10000 // 10 secondes timeout
+  timeout: 10000
 })
 
-// Intercepteur pour les réponses d'erreur
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Améliorer les messages d'erreur
     if (error.response) {
-      // Le serveur a répondu avec un code d'erreur
       const status = error.response.status
       const errorData = error.response.data
       
       let errorMessage = 'Erreur serveur'
       
-      // Messages d'erreur spécifiques selon le code de statut
       switch (status) {
         case 400:
           errorMessage = errorData?.error || 'Données invalides'
@@ -51,7 +47,6 @@ instance.interceptors.response.use(
       error.userMessage = errorMessage
       error.statusCode = status
     } else if (error.request) {
-      // La requête a été faite mais pas de réponse
       if (error.code === 'ECONNABORTED') {
         error.userMessage = 'Délai d\'attente dépassé. Veuillez réessayer.'
       } else {
@@ -59,7 +54,6 @@ instance.interceptors.response.use(
       }
       error.statusCode = 0
     } else {
-      // Erreur dans la configuration de la requête
       error.userMessage = 'Erreur de configuration de la requête'
       error.statusCode = -1
     }
@@ -87,31 +81,25 @@ export default {
     } catch (error) {
       console.error('API Error:', error)
       
-      // Retry logic for certain errors
       if (this.shouldRetry(error) && !error._retryCount) {
         error._retryCount = 1
         console.log('Retrying request...')
-        await this.delay(1000) // Wait 1 second before retry
+        await this.delay(1000)
         return this.call(method, resource, data, token)
       }
       
-      // Relancer l'erreur avec les informations améliorées
       throw error
     }
   },
 
-  // Helper method to determine if we should retry
   shouldRetry(error) {
-    // Retry on network errors or 5xx server errors
     return !error.response || (error.response.status >= 500 && error.response.status < 600)
   },
 
-  // Helper method for delay
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   },
 
-  // Public endpoints
   getQuizInfo() {
     return this.call('get', '/quiz-info')
   },
@@ -131,12 +119,10 @@ export default {
     })
   },
 
-  // Auth endpoint
   adminLogin(password) {
     return this.call('post', '/login', { password })
   },
 
-  // Admin endpoints (require token)
   getAllQuestions(token) {
     return this.call('get', '/questions/all', null, token)
   },

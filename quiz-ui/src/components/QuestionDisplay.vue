@@ -63,7 +63,6 @@
     import { Card, CardContent } from '@/components/ui/card'
     import LatexRenderer from '@/components/LatexRenderer.vue'
     
-    // Props
     const props = defineProps({
       currentQuestion: {
         type: Object,
@@ -71,16 +70,13 @@
       }
     })
     
-    // Emits
     const emit = defineEmits(['click-on-answer', 'request-next'])
     
-    // Local state
     const selectedAnswer = ref(null)
     const focusedIndex = ref(0)
     const answerButtons = ref([])
     const imageHasError = ref(false)
     
-    // Helpers
     const isValidImageSource = (src) => {
       if (!src || typeof src !== 'string') return false
       const s = src.trim()
@@ -92,7 +88,6 @@
     
     const validImageSrc = computed(() => isValidImageSource(props.currentQuestion?.image))
     
-    // Reset selected answer when question changes
     watch(() => props.currentQuestion, async () => {
       selectedAnswer.value = null
       imageHasError.value = false
@@ -102,21 +97,17 @@
       ;(el?.$el ?? el)?.focus?.()
     })
     
-    // Handle answer click
     const handleAnswerClick = (answerIndex) => {
       selectedAnswer.value = answerIndex
       emit('click-on-answer', answerIndex)
     }
     
-    // Handle image loading errors
     const handleImageError = (event) => {
       console.warn('Failed to load question image:', event.target.src)
-      // Hide the image element on error
       event.target.style.display = 'none'
       imageHasError.value = true
     }
     
-    // Keyboard navigation helpers
     const focusNext = () => {
       const total = props.currentQuestion?.possibleAnswers?.length || 0
       if (!total) return
@@ -149,7 +140,6 @@
         const el = answerButtons.value[focusedIndex.value]
         ;(el?.$el ?? el)?.focus?.()
       }
-      // sinon on laisse Tab sortir du radiogroupe vers l'élément suivant
     }
     
     const handleShiftTab = (idx, e) => {
@@ -159,6 +149,5 @@
         const el = answerButtons.value[focusedIndex.value]
         ;(el?.$el ?? el)?.focus?.()
       }
-      // sinon on laisse Shift+Tab revenir à l'élément précédent hors du groupe
     }
     </script>

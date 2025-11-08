@@ -1,7 +1,6 @@
 <template>
   <div class="space-y-2">
     <Label v-if="label">{{ label }}</Label>
-    <!-- Hidden file input always available -->
     <input 
       ref="fileInput" 
       type="file" 
@@ -10,7 +9,6 @@
       class="hidden"
     />
     
-    <!-- Upload Area -->
     <div v-if="!imageDataUrl" 
          @click="triggerFileInput"
          class="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors">
@@ -19,7 +17,6 @@
       <p class="text-xs text-muted-foreground">Formats acceptés: JPG, PNG, GIF (max 1MB)</p>
     </div>
     
-    <!-- Preview Area -->
     <div 
       v-else 
       class="relative w-full h-40 rounded-lg border bg-muted/10 overflow-hidden group"
@@ -53,7 +50,6 @@
       </div>
     </div>
     
-    <!-- Error Message -->
     <p v-if="error" class="text-sm text-destructive">{{ error }}</p>
   </div>
 </template>
@@ -64,7 +60,6 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Upload, Trash2 } from 'lucide-vue-next'
 
-// Props
 const props = defineProps({
   fileDataUrl: {
     type: String,
@@ -76,24 +71,20 @@ const props = defineProps({
   },
   maxSizeBytes: {
     type: Number,
-    default: 1024 * 1024 // 1MB par défaut
+    default: 1024 * 1024
   }
 })
 
-// Emits
 const emit = defineEmits(['file-change'])
 
-// Local state
 const fileInput = ref(null)
 const imageDataUrl = ref(props.fileDataUrl)
 const error = ref('')
 
-// Watch for external changes to fileDataUrl prop
 watch(() => props.fileDataUrl, (newValue) => {
   imageDataUrl.value = newValue
 })
 
-// Methods
 const triggerFileInput = () => {
   fileInput.value?.click()
 }
@@ -104,20 +95,17 @@ const handleFileChange = (event) => {
   
   error.value = ''
   
-  // Validate file size
   if (file.size > props.maxSizeBytes) {
     const maxSizeMB = (props.maxSizeBytes / (1024 * 1024)).toFixed(1)
     error.value = `La taille du fichier ne peut pas dépasser ${maxSizeMB}MB`
     return
   }
   
-  // Validate file type
   if (!file.type.startsWith('image/')) {
     error.value = 'Seuls les fichiers image sont acceptés'
     return
   }
   
-  // Compress and convert to base64
   compressImage(file)
     .then(compressedBase64 => {
       imageDataUrl.value = compressedBase64
@@ -136,7 +124,6 @@ const compressImage = (file) => {
     const img = new Image()
     
   img.onload = () => {
-      // Calculate new dimensions (max 800px width/height)
       const maxSize = 800
       let { width, height } = img
       
@@ -155,21 +142,17 @@ const compressImage = (file) => {
     canvas.width = width
     canvas.height = height
     
-    // Fill background to avoid artifacts with transparent images converted to JPEG
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, width, height)
     
-    // Draw and compress
     ctx.drawImage(img, 0, 0, width, height)
     
-    // Convert to base64 with compression (0.8 quality for JPEG)
     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8)
       resolve(compressedBase64)
     }
     
     img.onerror = () => reject(new Error('Erreur lors du chargement de l\'image'))
     
-    // Create object URL for the image
     img.src = URL.createObjectURL(file)
   })
 }

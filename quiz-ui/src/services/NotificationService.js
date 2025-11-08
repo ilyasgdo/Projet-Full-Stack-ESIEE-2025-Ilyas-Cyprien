@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 
-// État global des notifications
 const notifications = ref([])
 let notificationId = 0
 
@@ -25,7 +24,6 @@ export const addNotification = (message, type = 'info', duration = 5000) => {
   
   notifications.value.push(notification)
   
-  // Auto-suppression après la durée spécifiée
   if (duration > 0) {
     setTimeout(() => {
       removeNotification(id)
@@ -46,7 +44,6 @@ export const clearAll = () => {
   notifications.value.splice(0)
 }
 
-// Méthodes de convenance
 export const notifySuccess = (message, duration = 4000) => {
   return addNotification(message, 'success', duration)
 }
@@ -63,7 +60,6 @@ export const notifyInfo = (message, duration = 4000) => {
   return addNotification(message, 'info', duration)
 }
 
-// Gestion spécifique des erreurs API
 export const handleApiError = (error, defaultMessage = 'Une erreur est survenue') => {
   let message = defaultMessage
   
@@ -87,7 +83,6 @@ export default {
   notifyError,
   notifyWarning,
   notifyInfo,
-  // Aliases for convenience used across views
   success: notifySuccess,
   error: notifyError,
   warning: notifyWarning,

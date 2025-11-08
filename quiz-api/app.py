@@ -1,3 +1,9 @@
+"""
+Quiz API Application
+
+Flask REST API for managing quiz questions, answers, and participations.
+Provides endpoints for public quiz access and admin management.
+"""
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
@@ -12,23 +18,27 @@ from werkzeug.exceptions import HTTPException
 app = Flask(__name__)
 CORS(app)
 
-# Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'iloveflask')
-# Always store DB inside Flask instance folder to avoid cwd-dependent paths
 instance_path = app.instance_path
 os.makedirs(instance_path, exist_ok=True)
 db_path = os.path.join(instance_path, 'quiz.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAX_IMAGE_SIZE_BYTES'] = 1024 * 1024  # 1MB
+app.config['MAX_IMAGE_SIZE_BYTES'] = 1024 * 1024
 
-# Initialize database
 db.init_app(app)
 
-# Ensure JSON errors instead of default HTML pages
 @app.errorhandler(HTTPException)
 def handle_http_exception(e):
+    """Handle HTTP exceptions and return JSON error response.
+    
+    Args:
+        e: HTTPException instance with error details
+        
+    Returns:
+        JSON response with error message and status code
+    """
     response = jsonify({
         "error": e.description,
         "code": e.code
@@ -37,14 +47,28 @@ def handle_http_exception(e):
 
 @app.errorhandler(Exception)
 def handle_unexpected_exception(e):
+    """Handle unexpected exceptions and return generic error response.
+    
+    Args:
+        e: Exception instance
+        
+    Returns:
+        JSON response with generic error message and 500 status code
+    """
     return jsonify({
         "error": "Internal server error"
     }), 500
 
-# Request size validation middleware
 @app.before_request
 def check_request_size():
-    """Check if request size exceeds 1MB limit"""
+    """Middleware to check request size before processing.
+    
+    Validates that request content length does not exceed 1MB limit.
+    Returns 413 error if request is too large.
+    
+    Returns:
+        JSON error response with 413 status if request exceeds limit, None otherwise
+    """
     if request.content_length and request.content_length > app.config['MAX_IMAGE_SIZE_BYTES']:
         return jsonify({
             "error": "Request too large. Maximum size allowed is 1MB."
@@ -52,15 +76,29 @@ def check_request_size():
 
 @app.route('/')
 def hello_world():
+    """Health check endpoint.
+    
+    Returns:
+        JSON response with API status, version, and current timestamp
+    """
     return jsonify({
         "message": "Quiz API is running!",
         "version": "1.0.0",
         "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     })
 
-# Public endpoints - Front Office
 @app.route('/quiz-info', methods=['GET'])
 def get_quiz_info():
+    """Get quiz information and top scores.
+    
+    Public endpoint that returns the total number of questions and
+    the top 10 scores sorted by score (descending) and date.
+    
+    Returns:
+        JSON response with:
+            - size: total number of questions
+            - scores: list of top 10 participations with playerName, score, and date
+    """
     try:
         size = Question.query.count()
         participations = Participation.query.order_by(Participation.score.desc(), Participation.created_at.desc()).limit(10).all()
@@ -76,6 +114,14 @@ def get_quiz_info():
 @app.route('/questions/all', methods=['GET'])
 @token_required
 def get_all_questions():
+    """Get all questions for administration.
+    
+    Admin-only endpoint that returns all questions ordered by position.
+    Requires JWT authentication.
+    
+    Returns:
+        JSON response with list of all questions including their answers
+    """
     try:
         questions = Question.query.order_by(Question.position).all()
         return jsonify({
@@ -86,6 +132,16 @@ def get_all_questions():
 
 @app.route('/questions/<int:question_id>', methods=['GET'])
 def get_question_by_id(question_id):
+    """Get a question by its database ID.
+    
+    Public endpoint to retrieve a specific question by ID.
+    
+    Args:
+        question_id: Integer ID of the question
+        
+    Returns:
+        JSON response with question data or 404 if not found
+    """
     try:
         question = Question.query.get(question_id)
         if question is None:
@@ -96,6 +152,17 @@ def get_question_by_id(question_id):
 
 @app.route('/questions', methods=['GET'])
 def get_question_by_position():
+    """Get a question by its position in the quiz.
+    
+    Public endpoint to retrieve a question by its position number.
+    Position defaults to 1 if not provided.
+    
+    Query Parameters:
+        position: Integer position of the question (default: 1)
+        
+    Returns:
+        JSON response with question data or 404 if not found
+    """
     position = request.args.get('position', 1, type=int)
     try:
         question = Question.query.filter_by(position=position).first()
@@ -107,6 +174,22 @@ def get_question_by_position():
 
 @app.route('/participations', methods=['POST'])
 def submit_participation():
+    """Submit quiz participation with answers.
+    
+    Public endpoint to submit a player's answers for all questions.
+    Validates that the number of answers matches the number of questions,
+    calculates the score, and saves the participation.
+    
+    Request Body:
+        - playerName: String name of the player
+        - answers: List of answer positions (integers) in order of questions
+        
+    Returns:
+        JSON response with:
+            - answersSummaries: List of answer results with correctAnswerPosition and wasCorrect
+            - playerName: Name of the player
+            - score: Total number of correct answers
+    """
     data = request.get_json()
     try:
         player_name = data.get('playerName', 'Anonymous')
@@ -115,7 +198,6 @@ def submit_participation():
         if not answers:
             return jsonify({"error": "No answers provided"}), 400
         
-        # Get all questions ordered by position
         questions = Question.query.order_by(Question.position).all()
         
         if len(answers) != len(questions):
@@ -127,15 +209,11 @@ def submit_participation():
         for i, question in enumerate(questions):
             selected_answer_position = answers[i] if i < len(answers) else None
             
-            # Sort answers by order field to ensure consistent ordering
             sorted_answers = sorted(question.answers, key=lambda a: a.order)
             correct_answer = next((a for a in sorted_answers if a.is_correct), None)
             
             if correct_answer:
-                # Find the position (1-based) of the correct answer in the sorted list
                 correct_answer_position = next((j+1 for j, a in enumerate(sorted_answers) if a.is_correct), 1)
-                
-                # Check if the selected position matches the correct position
                 was_correct = selected_answer_position == correct_answer_position
                 
                 if was_correct:
@@ -146,7 +224,6 @@ def submit_participation():
                     "wasCorrect": was_correct
                 })
         
-        # Save participation
         participation = Participation(
             player_name=player_name,
             score=score
@@ -164,9 +241,18 @@ def submit_participation():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-# Auth endpoint
 @app.route('/login', methods=['POST'])
 def admin_login():
+    """Admin login endpoint.
+    
+    Authenticates admin user with password and returns JWT token.
+    
+    Request Body:
+        - password: String admin password
+        
+    Returns:
+        JSON response with JWT token on success, or 401 error on failure
+    """
     data = request.get_json()
     password = data.get('password', '')
     
@@ -176,37 +262,52 @@ def admin_login():
     else:
         return jsonify({"error": "Invalid password"}), 401
 
-# Rebuild database endpoint
 @app.route('/rebuild-db', methods=['POST'])
 @token_required
 def rebuild_database():
+    """Rebuild database schema.
+    
+    Admin-only endpoint that drops and recreates all database tables.
+    Requires JWT authentication.
+    
+    Returns:
+        "Ok" with 200 status on success
+    """
     try:
-        # Drop all tables and recreate them
         db.drop_all()
         db.create_all()
-        
-        # Don't initialize sample data - let Newman tests build their own question set
-        # init_sample_data()
-        
         return "Ok", 200
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Admin endpoints (protected)
 @app.route('/questions', methods=['POST'])
 @token_required
 def create_question():
+    """Create a new question.
+    
+    Admin-only endpoint to create a new question with answers.
+    Automatically shifts positions of existing questions if position is taken.
+    Requires exactly 4 answers with exactly 1 correct answer.
+    
+    Request Body:
+        - title: String title of the question
+        - text: String question text
+        - image: Optional base64 encoded image string
+        - position: Integer position in quiz (auto-assigned if not provided)
+        - possibleAnswers: List of 4 answer objects with text and isCorrect
+        
+    Returns:
+        JSON response with question ID on success
+    """
     try:
         data = request.get_json()
         
-        # Validate required fields
         required_fields = ['title', 'text', 'position', 'possibleAnswers']
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
         
-        # Validate answers
         answers = data.get('possibleAnswers', [])
         if len(answers) != 4:
             return jsonify({"error": "Exactly 4 answers are required"}), 400
@@ -215,24 +316,19 @@ def create_question():
         if len(correct_answers) != 1:
             return jsonify({"error": "Exactly one correct answer is required"}), 400
         
-        # Validate image if provided
         image = data.get('image')
         if image:
             is_valid, error_message = validate_base64_image(image)
             if not is_valid:
                 return jsonify({"error": error_message}), 400
         
-        # Check if position is available or shift existing questions
         position = data.get('position')
         if position is None:
-            # If no position specified, assign to the end
             max_position = db.session.query(db.func.max(Question.position)).scalar() or 0
             position = max_position + 1
         
-        # Shift existing questions at or after the target position down by one
         existing_question = Question.query.filter_by(position=position).first()
         if existing_question:
-            # Move in descending order to avoid unique conflicts
             questions_to_shift = Question.query.filter(
                 Question.position >= position
             ).order_by(Question.position.desc()).all()
@@ -240,7 +336,6 @@ def create_question():
                 q.position = q.position + 1
                 db.session.flush()
         
-        # Create question
         question = Question(
             position=position,
             title=data.get('title'),
@@ -248,9 +343,8 @@ def create_question():
             image=data.get('image')
         )
         db.session.add(question)
-        db.session.flush()  # Get question ID
+        db.session.flush()
         
-        # Create answers
         for i, answer_data in enumerate(answers):
             answer = Answer(
                 question_id=question.id,
@@ -270,11 +364,35 @@ def create_question():
 @app.route('/questions', methods=['PUT'])
 @token_required
 def update_question_without_id():
+    """Handle PUT request to /questions without ID (error case).
+    
+    Returns:
+        JSON error response indicating question ID is required
+    """
     return jsonify({"error": "Question ID is required for updates"}), 400
 
 @app.route('/questions/<int:question_id>', methods=['PUT'])
 @token_required
 def update_question(question_id):
+    """Update an existing question.
+    
+    Admin-only endpoint to update a question's properties.
+    Handles position changes by shifting other questions appropriately.
+    Validates image and ensures at most one correct answer.
+    
+    Args:
+        question_id: Integer ID of the question to update
+        
+    Request Body (all fields optional):
+        - title: String title
+        - text: String question text
+        - image: Optional base64 encoded image
+        - position: Integer new position
+        - possibleAnswers: List of answer objects
+        
+    Returns:
+        Empty response with 204 status on success
+    """
     try:
         question = Question.query.get(question_id)
         if question is None:
@@ -282,67 +400,54 @@ def update_question(question_id):
             
         data = request.get_json()
         
-        # Validate answers if provided
         if 'possibleAnswers' in data:
             answers = data.get('possibleAnswers', [])
-            if answers:  # Only validate if answers are actually provided
-                # For updates, we allow any number of answers (not just 4)
-                # The test sends only 3 answers, so we need to be flexible
+            if answers:
                 correct_answers = [a for a in answers if a.get('isCorrect', False)]
                 if len(correct_answers) > 1:
                     return jsonify({"error": "At most one correct answer is allowed"}), 400
         
-        # Validate image if provided
         if 'image' in data:
             image = data.get('image')
-            if image:  # Only validate if image is not None/empty
+            if image:
                 is_valid, error_message = validate_base64_image(image)
                 if not is_valid:
                     return jsonify({"error": error_message}), 400
         
-        # Handle position change
         if 'position' in data and data['position'] != question.position:
             new_position = data['position']
             old_position = question.position
             
-            # Validate new position
             total_questions = Question.query.count()
             if new_position < 1 or new_position > total_questions:
                 return jsonify({"error": f"Position must be between 1 and {total_questions}"}), 400
             
-            # Temporarily set the moving question to None to free up its position
             question.position = None
             db.session.flush()
             
             if new_position > old_position:
-                # Moving down: shift questions between old and new position up
                 questions_to_shift = Question.query.filter(
                     Question.position > old_position,
                     Question.position <= new_position
                 ).order_by(Question.position).all()
                 
-                # Shift each question up by one position
                 for q in questions_to_shift:
                     q.position = q.position - 1
-                    db.session.flush()  # Commit each change individually
+                    db.session.flush()
                     
             else:
-                # Moving up: shift questions between new and old position down
                 questions_to_shift = Question.query.filter(
                     Question.position >= new_position,
                     Question.position < old_position
-                ).order_by(Question.position.desc()).all()  # Reverse order to avoid conflicts
+                ).order_by(Question.position.desc()).all()
                 
-                # Shift each question down by one position
                 for q in questions_to_shift:
                     q.position = q.position + 1
-                    db.session.flush()  # Commit each change individually
+                    db.session.flush()
             
-            # Finally, set the target question to its new position
             question.position = new_position
             db.session.flush()
         
-        # Update question fields
         if 'title' in data:
             question.title = data['title']
         if 'text' in data:
@@ -352,12 +457,9 @@ def update_question(question_id):
         
         question.updated_at = datetime.utcnow()
         
-        # Update answers if provided
         if 'possibleAnswers' in data and data['possibleAnswers']:
-            # Delete existing answers
             Answer.query.filter_by(question_id=question_id).delete()
             
-            # Create new answers
             for i, answer_data in enumerate(data['possibleAnswers']):
                 answer = Answer(
                     question_id=question_id,
@@ -377,6 +479,17 @@ def update_question(question_id):
 @app.route('/questions/<int:question_id>', methods=['DELETE'])
 @token_required
 def delete_question(question_id):
+    """Delete a question by ID.
+    
+    Admin-only endpoint to delete a question and its answers.
+    Automatically shifts positions of remaining questions.
+    
+    Args:
+        question_id: Integer ID of the question to delete
+        
+    Returns:
+        Empty response with 204 status on success
+    """
     try:
         question = Question.query.get(question_id)
         if question is None:
@@ -384,19 +497,15 @@ def delete_question(question_id):
             
         position_to_delete = question.position
         
-        # Delete the question (answers will be deleted by cascade)
         db.session.delete(question)
-        db.session.flush()  # Ensure deletion is processed
+        db.session.flush()
         
-        # Shift subsequent questions up - use temporary negative positions to avoid constraint violations
         if position_to_delete is not None:
             questions_to_shift = Question.query.filter(Question.position > position_to_delete).order_by(Question.position).all()
-            # First, set all positions to negative values to avoid conflicts
             for i, q in enumerate(questions_to_shift):
                 q.position = -(i + 1)
             db.session.flush()
             
-            # Then set the correct positions
             for i, q in enumerate(questions_to_shift):
                 q.position = position_to_delete + i
         
@@ -405,12 +514,19 @@ def delete_question(question_id):
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error deleting question {question_id}: {str(e)}")  # Debug logging
         return jsonify({"error": str(e)}), 500
 
 @app.route('/questions/all', methods=['DELETE'])
 @token_required
 def delete_all_questions():
+    """Delete all questions and answers.
+    
+    Admin-only endpoint to delete all questions and their associated answers.
+    Requires JWT authentication.
+    
+    Returns:
+        Empty response with 204 status on success
+    """
     try:
         Answer.query.delete()
         Question.query.delete()
@@ -424,6 +540,14 @@ def delete_all_questions():
 @app.route('/participations/all', methods=['DELETE'])
 @token_required
 def delete_all_participations():
+    """Delete all participations.
+    
+    Admin-only endpoint to delete all participation records.
+    Requires JWT authentication.
+    
+    Returns:
+        Empty response with 204 status on success
+    """
     try:
         Participation.query.delete()
         db.session.commit()
@@ -434,23 +558,20 @@ def delete_all_participations():
         return jsonify({"error": str(e)}), 500
 
 def init_sample_data():
-    """Initialize the database with sample data."""
-    print("Starting init_sample_data...")
+    """Initialize sample quiz data for testing.
     
-    # Check if data already exists
+    Creates sample questions and answers if the database is empty.
+    Does nothing if questions already exist.
+    """
     existing_count = Question.query.count()
     if existing_count > 0:
-        print(f"Database already has {existing_count} questions, skipping initialization.")
         return
     
-    # Clear existing data
     Answer.query.delete()
     Question.query.delete()
     Participation.query.delete()
     db.session.commit()
-    print("Cleared existing data...")
     
-    # Questions with correct answer pattern [2, 2, 4, 4, 1, 2, 4, 2, 4, 1] to match Postman test expectations
     questions_data = [
         {
             "title": "Dummy Question",
@@ -524,10 +645,7 @@ def init_sample_data():
         }
     ]
     
-    # Create questions with exact data from Postman collection
-    print(f"Creating {len(questions_data)} questions...")
     for i, q_data in enumerate(questions_data):
-        print(f"Creating question {i+1}: {q_data['title']}")
         question = Question(
             title=q_data["title"], 
             text=q_data["text"], 
@@ -535,40 +653,33 @@ def init_sample_data():
             image=q_data["image"]
         )
         db.session.add(question)
-        db.session.flush()  # Get the question ID
-        print(f"Question {i+1} created with ID: {question.id}")
+        db.session.flush()
         
-        # Add 4 answers for each question
         for j, answer_text in enumerate(q_data["answers"]):
             is_correct = (j + 1 == q_data["correct"])
             answer = Answer(question_id=question.id, text=answer_text, is_correct=is_correct, order=j)
             db.session.add(answer)
-            print(f"  Answer {j+1}: {answer_text} (correct: {is_correct})")
     
-    print("Committing to database...")
     db.session.commit()
-    correct_pattern = [q["correct"] for q in questions_data]
-    question_count = Question.query.count()
-    print(f"Sample data initialized with {question_count} questions using correct pattern: {correct_pattern}")
 
 def init_math_questions():
-    """Initialize the database with pre-made mathematics questions containing LaTeX."""
-    print("Starting init_math_questions...")
+    """Initialize math quiz questions.
     
-    # Check if data already exists
+    Creates a set of mathematics questions with LaTeX-formatted text
+    if the database is empty.
+    
+    Returns:
+        True if questions were created, False if questions already existed
+    """
     existing_count = Question.query.count()
     if existing_count > 0:
-        print(f"Database already has {existing_count} questions, skipping initialization.")
         return False
     
-    # Clear existing data
     Answer.query.delete()
     Question.query.delete()
     Participation.query.delete()
     db.session.commit()
-    print("Cleared existing data...")
     
-    # Mathematics questions with LaTeX content
     questions_data = [
         {
             "title": "Arithmétique de base",
@@ -712,10 +823,7 @@ def init_math_questions():
         }
     ]
     
-    # Create questions
-    print(f"Creating {len(questions_data)} math questions...")
     for i, q_data in enumerate(questions_data):
-        print(f"Creating question {i+1}: {q_data['title']}")
         question = Question(
             title=q_data["title"], 
             text=q_data["text"], 
@@ -723,28 +831,24 @@ def init_math_questions():
             image=q_data["image"]
         )
         db.session.add(question)
-        db.session.flush()  # Get the question ID
-        print(f"Question {i+1} created with ID: {question.id}")
+        db.session.flush()
         
-        # Add 4 answers for each question
         for j, answer_text in enumerate(q_data["answers"]):
             is_correct = (j + 1 == q_data["correct"])
             answer = Answer(question_id=question.id, text=answer_text, is_correct=is_correct, order=j)
             db.session.add(answer)
-            print(f"  Answer {j+1}: {answer_text} (correct: {is_correct})")
     
-    print("Committing to database...")
     db.session.commit()
-    question_count = Question.query.count()
-    print(f"Math questions initialized with {question_count} questions.")
     return True
 
 def init_database():
-    """Initialize database with sample data"""
+    """Initialize database schema.
+    
+    Creates all database tables defined in models.py.
+    Should be called before running the application.
+    """
     with app.app_context():
         db.create_all()
-        # Don't initialize sample data - let the tests handle it
-        # init_sample_data()
 
 if __name__ == "__main__":
     init_database()

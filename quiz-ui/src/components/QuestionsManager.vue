@@ -1,13 +1,11 @@
 <template>
   <div class="py-8">
     <div class="max-w-4xl mx-auto">
-      <!-- Loading State (only before first question) -->
       <div v-if="loading && !currentQuestion && !noQuestions" class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
         <p class="text-muted-foreground">Chargement des questions...</p>
       </div>
 
-      <!-- No Questions State -->
       <div v-else-if="noQuestions" class="text-center">
         <div class="text-6xl mb-4">📝</div>
         <h2 class="text-2xl font-bold mb-2">Aucune question disponible</h2>
@@ -19,7 +17,6 @@
         </Button>
       </div>
 
-      <!-- Error State -->
       <div v-else-if="!currentQuestion && !loading" class="text-center">
         <div class="text-6xl mb-4">❌</div>
         <h2 class="text-2xl font-bold mb-2">Erreur</h2>
@@ -29,9 +26,7 @@
         </Button>
       </div>
 
-      <!-- Quiz Content -->
       <div v-else-if="currentQuestion">
-        <!-- Progress Bar -->
         <div class="mb-8 glass-card p-4">
           <div class="flex justify-between items-center mb-2">
             <span class="text-sm text-muted-foreground">
@@ -49,7 +44,6 @@
           </div>
         </div>
 
-        <!-- Question Display Component with Animation Container -->
         <div ref="questionContainer" class="question-container">
           <QuestionDisplay 
             :current-question="currentQuestion"
@@ -58,7 +52,6 @@
           />
         </div>
 
-        <!-- Navigation -->
         <div class="flex justify-between items-center">
           <Button
             variant="ghost"
@@ -100,10 +93,8 @@ import { gsap } from 'gsap'
 
 const router = useRouter()
 
-// Refs
 const questionContainer = ref(null)
 
-// State
 const currentQuestion = ref(null)
 const currentPosition = ref(1)
 const totalQuestions = ref(0)
@@ -114,7 +105,6 @@ const submitting = ref(false)
 const playerName = ref('')
 const noQuestions = ref(false)
 
-// Computed properties
 const progressPercentage = computed(() => {
   if (!totalQuestions.value) return 0
   return (currentPosition.value / totalQuestions.value) * 100
@@ -124,7 +114,6 @@ const isLastQuestion = computed(() => {
   return currentPosition.value === totalQuestions.value
 })
 
-// Lifecycle
 onMounted(async () => {
   playerName.value = ParticipationStorageService.getPlayerName()
   if (!playerName.value) {
@@ -134,7 +123,6 @@ onMounted(async () => {
   
   await loadQuizInfo()
   
-  // Vérifier s'il y a des questions avant d'essayer d'en charger une
   if (totalQuestions.value === 0) {
     noQuestions.value = true
     loading.value = false
@@ -144,7 +132,6 @@ onMounted(async () => {
   await loadQuestionByPosition(currentPosition.value)
 })
 
-// Methods
 const loadQuizInfo = async () => {
   try {
     const response = await QuizApiService.getQuizInfo()
@@ -159,7 +146,6 @@ const loadQuizInfo = async () => {
 const loadQuestionByPosition = async (position) => {
   loading.value = true
   
-  // Animate out current question with smooth slide
   if (currentQuestion.value && questionContainer.value) {
     await gsap.to(questionContainer.value, {
       autoAlpha: 0,
@@ -174,7 +160,6 @@ const loadQuestionByPosition = async (position) => {
     currentQuestion.value = response.data
     selectedAnswer.value = null
     
-    // Animate in new question with smooth slide
     if (questionContainer.value) {
       gsap.set(questionContainer.value, { autoAlpha: 0, xPercent: 100 })
       gsap.to(questionContainer.value, {
@@ -195,7 +180,6 @@ const loadQuestionByPosition = async (position) => {
 
 const answerClickedHandler = (answerIndex) => {
   selectedAnswer.value = answerIndex
-  // No zoom or flashy effects on selection per request
 }
 
 const nextQuestion = async () => {
@@ -204,14 +188,11 @@ const nextQuestion = async () => {
   submitting.value = true
   
   try {
-    // Store the answer
     answers.value.push(selectedAnswer.value)
     
     if (isLastQuestion.value) {
-      // Submit all answers
       await endQuiz()
     } else {
-      // Load next question
       currentPosition.value++
       await loadQuestionByPosition(currentPosition.value)
     }

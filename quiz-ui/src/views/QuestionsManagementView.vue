@@ -156,6 +156,13 @@
                 required
               />
               <p v-if="errors.text" class="text-sm text-destructive">{{ errors.text }}</p>
+              <!-- LaTeX Preview -->
+              <div v-if="form.text.trim()" class="mt-2 p-3 bg-muted/50 rounded-md border">
+                <p class="text-xs text-muted-foreground mb-2">Aperçu LaTeX :</p>
+                <div class="text-sm">
+                  <LatexRenderer :content="form.text" />
+                </div>
+              </div>
             </div>
 
             <div class="space-y-2">
@@ -166,6 +173,85 @@
                 @file-change="handleImageChange"
               />
               <p v-if="errors.image" class="text-sm text-destructive">{{ errors.image }}</p>
+            </div>
+
+            <!-- LaTeX Help Section -->
+            <div class="space-y-2">
+              <Button
+                type="button"
+                variant="outline"
+                @click="showLatexHelp = !showLatexHelp"
+                class="w-full justify-between"
+              >
+                <div class="flex items-center gap-2">
+                  <Info class="h-4 w-4" />
+                  <span>Aide LaTeX - Comment utiliser les équations mathématiques</span>
+                </div>
+                <ChevronDown v-if="!showLatexHelp" class="h-4 w-4" />
+                <ChevronUp v-else class="h-4 w-4" />
+              </Button>
+              <div v-if="showLatexHelp" class="p-4 bg-muted/50 rounded-md border space-y-4">
+                <div>
+                  <h4 class="font-semibold mb-2">Syntaxe LaTeX</h4>
+                  <p class="text-sm text-muted-foreground mb-3">
+                    Utilisez des délimiteurs spéciaux pour insérer des équations mathématiques :
+                  </p>
+                  <ul class="space-y-2 text-sm">
+                    <li>
+                      <strong>Math inline :</strong> Utilisez <code class="bg-background px-1 py-0.5 rounded">$...$</code> pour des équations dans le texte
+                      <div class="mt-1 p-2 bg-background rounded border">
+                        <p class="text-xs text-muted-foreground mb-1">Exemple : <code>$E = mc^2$</code></p>
+                        <div class="text-sm">
+                          <LatexRenderer content="$E = mc^2$" />
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <strong>Math en bloc :</strong> Utilisez <code class="bg-background px-1 py-0.5 rounded">$$...$$</code> pour des équations centrées
+                      <div class="mt-1 p-2 bg-background rounded border">
+                        <p class="text-xs text-muted-foreground mb-1">Exemple : <code>$$\int_0^1 x dx = \frac{1}{2}$$</code></p>
+                        <div class="text-sm">
+                          <LatexRenderer content="$$\int_0^1 x dx = \frac{1}{2}$$" />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-2">Exemples courants</h4>
+                  <div class="space-y-2 text-sm">
+                    <div class="p-2 bg-background rounded border">
+                      <p class="text-xs text-muted-foreground mb-1">Fractions : <code>$\frac{a}{b}$</code></p>
+                      <LatexRenderer content="$\frac{a}{b}$" />
+                    </div>
+                    <div class="p-2 bg-background rounded border">
+                      <p class="text-xs text-muted-foreground mb-1">Puissances : <code>$x^2 + y^2$</code></p>
+                      <LatexRenderer content="$x^2 + y^2$" />
+                    </div>
+                    <div class="p-2 bg-background rounded border">
+                      <p class="text-xs text-muted-foreground mb-1">Racines : <code>$\sqrt{x}$</code> ou <code>$\sqrt[n]{x}$</code></p>
+                      <LatexRenderer content="$\sqrt{x}$ ou $\sqrt[3]{x}$" />
+                    </div>
+                    <div class="p-2 bg-background rounded border">
+                      <p class="text-xs text-muted-foreground mb-1">Somme : <code>$\sum_{i=1}^{n} i$</code></p>
+                      <LatexRenderer content="$\sum_{i=1}^{n} i$" />
+                    </div>
+                    <div class="p-2 bg-background rounded border">
+                      <p class="text-xs text-muted-foreground mb-1">Intégrale : <code>$\int_0^1 f(x) dx$</code></p>
+                      <LatexRenderer content="$\int_0^1 f(x) dx$" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-2">Documentation</h4>
+                  <p class="text-sm text-muted-foreground">
+                    Pour plus d'informations sur la syntaxe LaTeX supportée, consultez la 
+                    <a href="https://katex.org/docs/supported.html" target="_blank" class="text-primary underline hover:text-primary/80">
+                      documentation KaTeX
+                    </a>.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div class="space-y-4">
@@ -197,6 +283,13 @@
                       <Label :for="`correct_${index}`" class="text-sm font-normal">
                         Correcte
                       </Label>
+                    </div>
+                  </div>
+                  <!-- LaTeX Preview for Answer -->
+                  <div v-if="answer.text.trim()" class="p-2 bg-muted/50 rounded-md border">
+                    <p class="text-xs text-muted-foreground mb-1">Aperçu LaTeX :</p>
+                    <div class="text-sm">
+                      <LatexRenderer :content="answer.text" />
                     </div>
                   </div>
                   <p v-if="errors[`answer_${index}`]" class="text-sm text-destructive">
@@ -259,7 +352,10 @@ import {
   CheckCircle, 
   Circle, 
   Save, 
-  Loader2 
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Info
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -270,6 +366,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import ImageUpload from '@/components/ImageUpload.vue'
+import LatexRenderer from '@/components/LatexRenderer.vue'
 import QuizApiService from '../services/QuizApiService.js'
 import AuthStorageService from '../services/AuthStorageService.js'
 import NotificationService from '../services/NotificationService.js'
@@ -288,6 +385,7 @@ const deleting = ref(false)
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteConfirm = ref(false)
+const showLatexHelp = ref(false)
 
 // Form Data
 const form = ref({

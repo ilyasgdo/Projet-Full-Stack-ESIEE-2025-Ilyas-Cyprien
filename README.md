@@ -17,6 +17,52 @@ Application de quiz complète développée avec Flask (API) et Vue 3 (Frontend) 
 - ✅ Upload d'images en base64
 - ✅ Suppression des participations
 - ✅ Interface admin responsive
+- ✅ Support LaTeX pour équations mathématiques
+
+## 📐 Support LaTeX
+
+L'application supporte l'intégration d'équations mathématiques en LaTeX dans les questions et réponses.
+
+### Utilisation
+
+#### Syntaxe de base
+
+- **Math inline** : Utilisez `$...$` pour des équations dans le texte
+  - Exemple : `$E = mc^2$` → E = mc²
+  - Exemple : `La formule $x^2 + y^2 = r^2$ représente un cercle`
+
+- **Math en bloc** : Utilisez `$$...$$` pour des équations centrées
+  - Exemple : `$$\int_0^1 x dx = \frac{1}{2}$$`
+  - Les équations en bloc sont centrées et prennent leur propre ligne
+
+#### Exemples courants
+
+| Syntaxe LaTeX | Résultat |
+|--------------|----------|
+| `$\frac{a}{b}$` | Fraction a/b |
+| `$x^2 + y^2$` | Puissances |
+| `$\sqrt{x}$` | Racine carrée |
+| `$\sqrt[n]{x}$` | Racine n-ième |
+| `$\sum_{i=1}^{n} i$` | Somme |
+| `$\int_0^1 f(x) dx$` | Intégrale |
+| `$\alpha, \beta, \gamma$` | Lettres grecques |
+
+#### Fonctionnalités
+
+- **Aperçu en temps réel** : Lors de la création/édition d'une question, un aperçu LaTeX s'affiche automatiquement sous les champs de texte
+- **Aide intégrée** : Section d'aide collapsible dans l'éditeur de questions avec exemples et syntaxe
+- **Rendu côté client** : Utilisation de KaTeX pour un rendu rapide et performant
+- **Support complet** : Fonctionne dans le texte des questions et dans les réponses
+
+#### Documentation
+
+Pour la liste complète des fonctions LaTeX supportées, consultez la [documentation KaTeX](https://katex.org/docs/supported.html).
+
+### Dépannage
+
+- **Les équations ne s'affichent pas** : Vérifiez que les délimiteurs `$` ou `$$` sont correctement placés
+- **Erreur de rendu** : Consultez la console du navigateur pour les détails de l'erreur LaTeX
+- **Syntaxe invalide** : En cas d'erreur, le texte LaTeX original sera affiché au lieu de l'équation
 
 ## 🛠 Technologies
 
@@ -33,6 +79,7 @@ Application de quiz complète développée avec Flask (API) et Vue 3 (Frontend) 
 - **Vue Router** - Navigation
 - **Tailwind CSS** - Framework CSS
 - **Axios** - Client HTTP
+- **KaTeX** - Rendu LaTeX pour équations mathématiques
 
 ## 🚀 Installation et Lancement
 

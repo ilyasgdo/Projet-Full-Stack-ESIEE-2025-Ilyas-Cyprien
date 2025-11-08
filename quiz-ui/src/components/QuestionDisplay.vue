@@ -13,9 +13,9 @@
         @error="handleImageError"
       />
       
-      <p v-if="currentQuestion.text" class="text-lg mb-6">
-        {{ currentQuestion.text }}
-      </p>
+      <div v-if="currentQuestion.text" class="text-lg mb-6">
+        <LatexRenderer :content="currentQuestion.text" />
+      </div>
       
       <div class="space-y-3" role="radiogroup" :aria-label="'Choisissez une réponse pour ' + currentQuestion.title">
         <Button
@@ -49,7 +49,7 @@
               ]"
               aria-hidden="true"
             ></div>
-            {{ answer.text }}
+            <LatexRenderer :content="answer.text" />
           </div>
         </Button>
       </div>
@@ -61,6 +61,7 @@
     import { ref, watch, computed, nextTick } from 'vue'
     import { Button } from '@/components/ui/button'
     import { Card, CardContent } from '@/components/ui/card'
+    import LatexRenderer from '@/components/LatexRenderer.vue'
     
     // Props
     const props = defineProps({

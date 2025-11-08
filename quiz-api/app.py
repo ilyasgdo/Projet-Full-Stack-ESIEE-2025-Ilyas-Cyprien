@@ -551,6 +551,194 @@ def init_sample_data():
     question_count = Question.query.count()
     print(f"Sample data initialized with {question_count} questions using correct pattern: {correct_pattern}")
 
+def init_math_questions():
+    """Initialize the database with pre-made mathematics questions containing LaTeX."""
+    print("Starting init_math_questions...")
+    
+    # Check if data already exists
+    existing_count = Question.query.count()
+    if existing_count > 0:
+        print(f"Database already has {existing_count} questions, skipping initialization.")
+        return False
+    
+    # Clear existing data
+    Answer.query.delete()
+    Question.query.delete()
+    Participation.query.delete()
+    db.session.commit()
+    print("Cleared existing data...")
+    
+    # Mathematics questions with LaTeX content
+    questions_data = [
+        {
+            "title": "Arithmétique de base",
+            "text": "Quel est le résultat de $2 + 3 \\times 4$ ?",
+            "image": "",
+            "answers": ["$20$", "$14$", "$24$", "$11$"],
+            "correct": 2
+        },
+        {
+            "title": "Algèbre simple",
+            "text": "Résolvez l'équation : $2x + 5 = 13$. Quelle est la valeur de $x$ ?",
+            "image": "",
+            "answers": ["$x = 3$", "$x = 4$", "$x = 5$", "$x = 6$"],
+            "correct": 2
+        },
+        {
+            "title": "Addition de fractions",
+            "text": "Quel est le résultat de $\\frac{3}{4} + \\frac{1}{2}$ ?",
+            "image": "",
+            "answers": ["$\\frac{4}{6}$", "$\\frac{5}{4}$", "$\\frac{1}{1}$", "$\\frac{1}{4}$"],
+            "correct": 2
+        },
+        {
+            "title": "Géométrie - Aire d'un cercle",
+            "text": "Quelle est l'aire d'un cercle de rayon $r = 5$ ? (Utilisez $\\pi = 3.14$)",
+            "image": "",
+            "answers": ["$78.5$", "$31.4$", "$15.7$", "$25.0$"],
+            "correct": 1
+        },
+        {
+            "title": "Puissances",
+            "text": "Quelle est la valeur de $x^2$ lorsque $x = 4$ ?",
+            "image": "",
+            "answers": ["$8$", "$16$", "$12$", "$6$"],
+            "correct": 2
+        },
+        {
+            "title": "Racines carrées",
+            "text": "Quelle est la valeur de $\\sqrt{64}$ ?",
+            "image": "",
+            "answers": ["$6$", "$7$", "$8$", "$9$"],
+            "correct": 3
+        },
+        {
+            "title": "Pourcentages",
+            "text": "Si un article coûte $50$€ et qu'il est soldé à $20\\%$ de réduction, quel est le nouveau prix ?",
+            "image": "",
+            "answers": ["$30$€", "$40$€", "$45$€", "$35$€"],
+            "correct": 2
+        },
+        {
+            "title": "Équation du second degré",
+            "text": "Quelle est la solution de l'équation $x^2 - 9 = 0$ ?",
+            "image": "",
+            "answers": ["$x = 3$ ou $x = -3$", "$x = 9$", "$x = 0$", "$x = 3$ uniquement"],
+            "correct": 1
+        },
+        {
+            "title": "Géométrie - Périmètre d'un rectangle",
+            "text": "Quel est le périmètre d'un rectangle de longueur $l = 8$ et de largeur $w = 5$ ?",
+            "image": "",
+            "answers": ["$13$", "$26$", "$40$", "$20$"],
+            "correct": 2
+        },
+        {
+            "title": "Multiplication de fractions",
+            "text": "Quel est le résultat de $\\frac{2}{3} \\times \\frac{3}{4}$ ?",
+            "image": "",
+            "answers": ["$\\frac{5}{7}$", "$\\frac{6}{12}$", "$\\frac{1}{2}$", "$\\frac{2}{4}$"],
+            "correct": 3
+        },
+        {
+            "title": "Addition de nombres négatifs",
+            "text": "Quel est le résultat de $(-5) + (-3)$ ?",
+            "image": "",
+            "answers": ["$-8$", "$-2$", "$2$", "$8$"],
+            "correct": 1
+        },
+        {
+            "title": "Division simple",
+            "text": "Quel est le résultat de $\\frac{15}{3}$ ?",
+            "image": "",
+            "answers": ["$3$", "$5$", "$12$", "$18$"],
+            "correct": 2
+        },
+        {
+            "title": "Géométrie - Aire d'un triangle",
+            "text": "Quelle est l'aire d'un triangle de base $b = 6$ et de hauteur $h = 4$ ? (Formule : $A = \\frac{1}{2} \\times b \\times h$)",
+            "image": "",
+            "answers": ["$10$", "$12$", "$24$", "$20$"],
+            "correct": 2
+        },
+        {
+            "title": "Simplification d'expression algébrique",
+            "text": "Simplifiez l'expression : $3x + 2x - x$",
+            "image": "",
+            "answers": ["$4x$", "$5x$", "$6x$", "$x$"],
+            "correct": 1
+        },
+        {
+            "title": "Problème de proportion",
+            "text": "Si $\\frac{2}{5}$ d'un nombre vaut $10$, quel est ce nombre ?",
+            "image": "",
+            "answers": ["$20$", "$25$", "$15$", "$30$"],
+            "correct": 2
+        },
+        {
+            "title": "Soustraction de fractions",
+            "text": "Quel est le résultat de $\\frac{5}{6} - \\frac{1}{3}$ ?",
+            "image": "",
+            "answers": ["$\\frac{4}{3}$", "$\\frac{1}{2}$", "$\\frac{1}{3}$", "$\\frac{4}{6}$"],
+            "correct": 2
+        },
+        {
+            "title": "Racine cubique",
+            "text": "Quelle est la valeur de $\\sqrt[3]{27}$ ?",
+            "image": "",
+            "answers": ["$3$", "$9$", "$6$", "$27$"],
+            "correct": 1
+        },
+        {
+            "title": "Équation avec fractions",
+            "text": "Résolvez : $\\frac{x}{2} = 7$. Quelle est la valeur de $x$ ?",
+            "image": "",
+            "answers": ["$x = 3.5$", "$x = 14$", "$x = 9$", "$x = 5$"],
+            "correct": 2
+        },
+        {
+            "title": "Géométrie - Volume d'un cube",
+            "text": "Quel est le volume d'un cube dont le côté mesure $a = 3$ ? (Formule : $V = a^3$)",
+            "image": "",
+            "answers": ["$9$", "$27$", "$18$", "$12$"],
+            "correct": 2
+        },
+        {
+            "title": "Problème de moyenne",
+            "text": "Quelle est la moyenne des nombres $4$, $6$, $8$ et $10$ ?",
+            "image": "",
+            "answers": ["$6$", "$7$", "$8$", "$9$"],
+            "correct": 2
+        }
+    ]
+    
+    # Create questions
+    print(f"Creating {len(questions_data)} math questions...")
+    for i, q_data in enumerate(questions_data):
+        print(f"Creating question {i+1}: {q_data['title']}")
+        question = Question(
+            title=q_data["title"], 
+            text=q_data["text"], 
+            position=i+1, 
+            image=q_data["image"]
+        )
+        db.session.add(question)
+        db.session.flush()  # Get the question ID
+        print(f"Question {i+1} created with ID: {question.id}")
+        
+        # Add 4 answers for each question
+        for j, answer_text in enumerate(q_data["answers"]):
+            is_correct = (j + 1 == q_data["correct"])
+            answer = Answer(question_id=question.id, text=answer_text, is_correct=is_correct, order=j)
+            db.session.add(answer)
+            print(f"  Answer {j+1}: {answer_text} (correct: {is_correct})")
+    
+    print("Committing to database...")
+    db.session.commit()
+    question_count = Question.query.count()
+    print(f"Math questions initialized with {question_count} questions.")
+    return True
+
 def init_database():
     """Initialize database with sample data"""
     with app.app_context():

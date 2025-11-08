@@ -33,7 +33,7 @@
             'w-full p-4 text-left rounded-lg border transition-all duration-200 h-auto justify-start hover-float hover-glow ambient-shine',
             selectedAnswer === (idx + 1)
               ? 'border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(59,130,246,0.45)]'
-              : 'border-border hover:border-primary/50 hover:bg-accent'
+              : 'border-border hover:border-primary/50 hover:bg-primary/10 hover:text-primary'
           ]"
           role="radio"
           :aria-checked="selectedAnswer === (idx + 1) ? 'true' : 'false'"

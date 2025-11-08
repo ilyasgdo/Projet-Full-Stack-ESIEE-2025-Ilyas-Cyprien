@@ -12,9 +12,21 @@ a,
   padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+/* Removed global hover background - links now use Tailwind hover styles */
+/* Ensure router-links and styled navigation links don't have background on hover */
+a.router-link-active,
+a[class*="hover:text-"],
+a[class*="hover-float"],
+header a,
+nav a {
+  background-color: transparent !important;
+}
+
+a.router-link-active:hover,
+a[class*="hover:text-"]:hover,
+a[class*="hover-float"]:hover,
+header a:hover,
+nav a:hover {
+  background-color: transparent !important;
 }
 

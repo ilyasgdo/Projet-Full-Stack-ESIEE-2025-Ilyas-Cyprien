@@ -1,4 +1,4 @@
-describe('Quiz Application - Complete User Flow', () => {
+describe('qrious - Complete User Flow', () => {
   beforeEach(() => {
     // Mock quiz info response
     cy.intercept('GET', '/quiz-info', {

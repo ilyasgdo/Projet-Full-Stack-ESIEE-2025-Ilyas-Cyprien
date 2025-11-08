@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu } from 'lucide-vue-next'
 import NotificationContainer from '@/components/NotificationContainer.vue'
+import logo from '@/assets/logo.png'
 
 const isMenuOpen = ref(false)
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-modern math-overlay">
+  <div id="app" class="min-h-screen bg-modern math-overlay flex flex-col">
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/10 via-background/80 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/20">
       <div class="container mx-auto px-4 lg:px-6">
@@ -17,13 +18,11 @@ const isMenuOpen = ref(false)
           <!-- Logo -->
           <router-link 
             to="/" 
-            class="flex items-center space-x-2 text-xl font-bold text-foreground hover:text-primary transition-colors"
+            class="flex items-center space-x-3 text-foreground hover:text-primary transition-colors"
             aria-label="Aller à l'accueil"
           >
-            <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center justify-center">
-              <span class="text-primary-foreground font-bold text-sm">π</span>
-            </div>
-            <span class="hidden sm:inline-block text-gradient">Math Quiz</span>
+            <img :src="logo" alt="Qrious logo" class="h-10 w-auto object-contain" />
+            <span class="hidden sm:inline-block text-gradient text-2xl font-black tracking-tight">Qrious</span>
           </router-link>
           
           <!-- Desktop Navigation -->
@@ -82,15 +81,15 @@ const isMenuOpen = ref(false)
     </header>
 
     <!-- Main Content -->
-    <main id="main-content" tabindex="-1" class="flex-1 container mx-auto px-4 lg:px-6 max-w-7xl" role="main">
+    <main id="main-content" tabindex="-1" class="flex-1 flex flex-col container mx-auto px-4 lg:px-6 max-w-7xl w-full" role="main">
       <router-view />
     </main>
 
     <!-- Footer -->
-    <footer class="border-t bg-muted/50">
-      <div class="container mx-auto px-4 lg:px-6 py-6">
-        <div class="text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Math Quiz. Tous droits réservés.</p>
+    <footer class="border-t bg-muted/50 mt-auto">
+      <div class="container mx-auto px-4 lg:px-6 py-4">
+        <div class="text-right text-sm text-muted-foreground">
+          <p>&copy; 2025</p>
         </div>
       </div>
     </footer>

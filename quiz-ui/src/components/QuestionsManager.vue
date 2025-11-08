@@ -2,19 +2,31 @@
   <div class="py-8">
     <div class="max-w-4xl mx-auto">
       <!-- Loading State (only before first question) -->
-      <div v-if="loading && !currentQuestion" class="text-center">
+      <div v-if="loading && !currentQuestion && !noQuestions" class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
         <p class="text-muted-foreground">Chargement des questions...</p>
       </div>
 
+      <!-- No Questions State -->
+      <div v-else-if="noQuestions" class="text-center">
+        <div class="text-6xl mb-4">📝</div>
+        <h2 class="text-2xl font-bold mb-2">Aucune question disponible</h2>
+        <p class="text-muted-foreground mb-6">
+          Il n'y a actuellement aucune question dans le quiz. Veuillez contacter l'administrateur.
+        </p>
+        <Button variant="outline" @click="goHome" class="hover-float">
+          Retour à l'accueil
+        </Button>
+      </div>
+
       <!-- Error State -->
-      <div v-else-if="!currentQuestion" class="text-center">
+      <div v-else-if="!currentQuestion && !loading" class="text-center">
         <div class="text-6xl mb-4">❌</div>
         <h2 class="text-2xl font-bold mb-2">Erreur</h2>
         <p class="text-destructive mb-6">Erreur lors du chargement de la question</p>
         <Button variant="outline" @click="goHome" class="hover-float">
-               Retour à l'accueil
-             </Button>
+          Retour à l'accueil
+        </Button>
       </div>
 
       <!-- Quiz Content -->
@@ -100,6 +112,7 @@ const answers = ref([])
 const loading = ref(true)
 const submitting = ref(false)
 const playerName = ref('')
+const noQuestions = ref(false)
 
 // Computed properties
 const progressPercentage = computed(() => {
@@ -120,6 +133,14 @@ onMounted(async () => {
   }
   
   await loadQuizInfo()
+  
+  // Vérifier s'il y a des questions avant d'essayer d'en charger une
+  if (totalQuestions.value === 0) {
+    noQuestions.value = true
+    loading.value = false
+    return
+  }
+  
   await loadQuestionByPosition(currentPosition.value)
 })
 
@@ -127,10 +148,11 @@ onMounted(async () => {
 const loadQuizInfo = async () => {
   try {
     const response = await QuizApiService.getQuizInfo()
-    totalQuestions.value = response.data.size
+    totalQuestions.value = response.data.size || 0
   } catch (error) {
     console.error('Failed to load quiz info:', error)
     NotificationService.handleApiError(error)
+    totalQuestions.value = 0
   }
 }
 

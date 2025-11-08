@@ -1,4 +1,4 @@
-# Quiz Application - Full Stack (Flask + Vue 3)
+# Qrious - Full Stack (Flask + Vue 3)
 
 Application de quiz complète développée avec Flask (API) et Vue 3 (Frontend) dans le cadre du projet ESIEE 2025.
 

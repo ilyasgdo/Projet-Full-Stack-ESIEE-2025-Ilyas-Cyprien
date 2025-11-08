@@ -84,6 +84,29 @@ docker build -t votrehandle/quiz-prod-api .
 docker build -t votrehandle/quiz-prod-ui -f Dockerfile.prod .
 ```
 
+### Images Docker publiques
+- `ssssssss3/quiz-prod-api:latest` → https://hub.docker.com/r/ssssssss3/quiz-prod-api/tags
+- `ssssssss3/quiz-prod-ui:latest` → https://hub.docker.com/r/ssssssss3/quiz-prod-ui/tags
+
+Pull rapide:
+```bash
+docker pull ssssssss3/quiz-prod-api:latest
+docker pull ssssssss3/quiz-prod-ui:latest
+```
+
+Exécution rapide:
+```bash
+# API
+docker run -d --name quiz-prod-api -p 5000:5000 ssssssss3/quiz-prod-api:latest
+
+# UI (avec proxy /api)
+# Place ce fichier nginx-ui.conf à la racine du projet puis:
+# server { ... proxy_pass http://host.docker.internal:5000/; ... }
+docker run -d --name quiz-prod-ui -p 8080:80 \
+  -v %CD%\\nginx-ui.conf:/etc/nginx/conf.d/default.conf \
+  ssssssss3/quiz-prod-ui:latest
+```
+
 ## 📊 API Endpoints
 
 ### Publics
@@ -150,12 +173,25 @@ python test_api.py
 ## 📝 Base de données
 
 ### Modèle
-- **questions** (id, position, title, text, image, timestamps)
-- **answers** (id, question_id, text, is_correct)
-- **participations** (id, player_name, score, created_at)
+- **questions**: id (PK), position (unique, nullable), title (200, requis), text (requis), image (base64, optionnel), created_at, updated_at
+- **answers**: id (PK), question_id (FK -> questions.id), text (500, requis), is_correct (bool), order (int, défaut 0)
+- **participations**: id (PK), player_name (100, requis), score (int, requis), created_at
+- **admin_sessions**: id (PK), token (200, unique), created_at, expires_at
+
+Relations:
+- 1 **question** → N **answers** (cascade delete-orphan)
+- Une seule réponse correcte par question (contrainte logique côté API)
+
+Stockage:
+- SQLite dans `instance/quiz.db` (chemin géré par Flask, cf. `app.py`).
+
+### Schéma détaillé
+![Schéma ER](docs/db-schema.svg)
+
+Voir `docs/db-schema.md` pour la description complète (champs, contraintes et diagramme).
 
 ### Données d'exemple
-L'API initialise automatiquement 3 questions d'exemple au premier démarrage.
+La base est vide par défaut. Utilisez les endpoints admin (`/login`, `/questions`, `/rebuild-db`) pour créer/initialiser les questions.
 
 ## 🎨 Design
 

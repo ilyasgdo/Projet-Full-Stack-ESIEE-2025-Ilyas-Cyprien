@@ -205,13 +205,49 @@ docker run -d --name quiz-prod-ui -p 8080:80 \
 
 ## 🧪 Tests
 
-### Tests API automatisés
+### Tests unitaires (Vitest)
+
+Les tests unitaires couvrent les services et composants principaux du frontend.
+
 ```bash
-cd quiz-api
-python test_api.py
+cd quiz-ui
+npm test              # Mode watch
+npm run test:run      # Exécution unique
+npm run test:ui       # Interface graphique
 ```
 
+**Fichiers de test :**
+
+- **`src/test/services/QuizApiService.test.js`** (18 tests)
+  - Tests des endpoints API (GET, POST, PUT, DELETE)
+  - Gestion des erreurs et intercepteurs
+  - Logique de retry automatique
+  - Authentification avec tokens JWT
+
+- **`src/test/services/NotificationService.test.js`** (16 tests)
+  - Ajout/suppression de notifications
+  - Types de notifications (success, error, warning, info)
+  - Auto-suppression après timeout
+  - Gestion des erreurs API
+
+- **`src/test/components/QuestionDisplay.test.js`** (19 tests)
+  - Rendu des questions (titre, texte, image)
+  - Intégration LaTeX avec LatexRenderer
+  - Sélection et émission d'événements
+  - Navigation clavier (Tab, Enter, Space)
+  - Attributs ARIA pour l'accessibilité
+
+- **`src/test/components/ImageUpload.test.js`** (17 tests)
+  - Validation de taille et type de fichier
+  - Compression d'images
+  - Prévisualisation
+  - Gestion des erreurs de chargement
+
+**Total : 70 tests unitaires**
+
 ### Tests manuels
+
+Pour des tests manuels complémentaires :
 1. Démarrer backend et frontend
 2. Naviguer sur http://localhost:5173
 3. Tester parcours joueur complet

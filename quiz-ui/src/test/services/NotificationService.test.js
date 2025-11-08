@@ -27,6 +27,9 @@ describe('NotificationService', () => {
         message: 'Test message',
         type: 'success'
       })
+      expect(notifications[0]).toHaveProperty('id')
+      expect(notifications[0]).toHaveProperty('timestamp')
+      expect(notifications[0]).toHaveProperty('duration')
     })
 
     it('generates unique id for each notification', () => {
@@ -48,11 +51,15 @@ describe('NotificationService', () => {
       vi.useFakeTimers()
       
       addNotification('Test message', 'success', 1000)
-      const { notifications } = useNotifications()
+      let { notifications } = useNotifications()
       expect(notifications).toHaveLength(1)
       
       vi.advanceTimersByTime(1000)
-      expect(notifications).toHaveLength(0)
+      await vi.runAllTimersAsync()
+      
+      // Get fresh notifications after timeout
+      const { notifications: updatedNotifications } = useNotifications()
+      expect(updatedNotifications).toHaveLength(0)
       
       vi.useRealTimers()
     })
@@ -182,13 +189,14 @@ describe('NotificationService', () => {
     it('handles unknown error with default message', () => {
       const unknownError = {}
       
-      handleApiError(unknownError)
+      const notificationId = handleApiError(unknownError)
       
       const { notifications } = useNotifications()
       expect(notifications[0]).toMatchObject({
         message: 'Une erreur est survenue',
         type: 'error'
       })
+      expect(notificationId).toBe(notifications[0].id)
     })
 
     it('uses custom default message', () => {

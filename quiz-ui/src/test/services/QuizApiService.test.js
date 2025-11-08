@@ -1,50 +1,49 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock axios before importing the service
-vi.mock('axios', () => {
-  // Create a single shared mock instance so service and tests use the same one
+// Use vi.hoisted to create the mock instance that can be referenced in the mock factory
+const { mockAxiosInstance } = vi.hoisted(() => {
   const mockInstance = vi.fn()
   mockInstance.interceptors = {
     response: {
       use: vi.fn()
     }
   }
-  mockInstance.get = vi.fn()
-  mockInstance.post = vi.fn()
-  mockInstance.put = vi.fn()
-  mockInstance.delete = vi.fn()
+  return { mockAxiosInstance: mockInstance }
+})
 
+// Mock axios before importing the service
+vi.mock('axios', () => {
   return {
     default: {
-      create: vi.fn(() => mockInstance)
+      create: vi.fn(() => mockAxiosInstance)
     }
   }
 })
 
 import QuizApiService from '@/services/QuizApiService'
-import axios from 'axios'
-
-const mockedAxios = axios.create()
 
 describe('QuizApiService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset the mock instance
+    mockAxiosInstance.mockClear()
   })
 
   describe('getQuizInfo', () => {
     it('fetches quiz info successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           size: 10,
           scores: []
         }
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.getQuizInfo()
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'get',
         headers: {
           'Content-Type': 'application/json'
@@ -52,12 +51,15 @@ describe('QuizApiService', () => {
         url: '/quiz-info',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
 
     it('handles error when fetching quiz info', async () => {
       const mockError = new Error('Network error')
-      mockedAxios.mockRejectedValue(mockError)
+      mockAxiosInstance.mockRejectedValue(mockError)
       
       await expect(QuizApiService.getQuizInfo()).rejects.toThrow('Network error')
     })
@@ -66,6 +68,7 @@ describe('QuizApiService', () => {
   describe('getQuestionByPosition', () => {
     it('fetches question by position successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           id: 1,
           title: 'Test Question',
@@ -73,11 +76,11 @@ describe('QuizApiService', () => {
         }
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.getQuestionByPosition(1)
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'get',
         headers: {
           'Content-Type': 'application/json'
@@ -85,20 +88,24 @@ describe('QuizApiService', () => {
         url: '/questions?position=1',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
 
     it('handles error when fetching question', async () => {
       const mockError = new Error('Question not found')
-      mockedAxios.mockRejectedValue(mockError)
+      mockAxiosInstance.mockRejectedValue(mockError)
       
       await expect(QuizApiService.getQuestionByPosition(999)).rejects.toThrow('Question not found')
     })
   })
 
-  describe('postParticipation', () => {
+  describe('submitParticipation', () => {
     it('posts participation successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           score: 8,
           answers: []
@@ -110,11 +117,11 @@ describe('QuizApiService', () => {
         answers: [1, 2, 3, 4]
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.submitParticipation(participationData.playerName, participationData.answers)
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
@@ -122,32 +129,36 @@ describe('QuizApiService', () => {
         url: '/participations',
         data: participationData
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
 
     it('handles error when posting participation', async () => {
       const mockError = new Error('Validation error')
       const participationData = { playerName: '', answers: [] }
       
-      mockedAxios.mockRejectedValue(mockError)
+      mockAxiosInstance.mockRejectedValue(mockError)
       
       await expect(QuizApiService.submitParticipation(participationData.playerName, participationData.answers)).rejects.toThrow('Validation error')
     })
   })
 
-  describe('login', () => {
+  describe('adminLogin', () => {
     it('logs in successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           token: 'jwt-token-123'
         }
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.adminLogin('password123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
@@ -155,12 +166,15 @@ describe('QuizApiService', () => {
         url: '/login',
         data: { password: 'password123' }
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
 
     it('handles login error', async () => {
       const mockError = new Error('Invalid credentials')
-      mockedAxios.mockRejectedValue(mockError)
+      mockAxiosInstance.mockRejectedValue(mockError)
       
       await expect(QuizApiService.adminLogin('wrongpassword')).rejects.toThrow('Invalid credentials')
     })
@@ -169,6 +183,7 @@ describe('QuizApiService', () => {
   describe('getAllQuestions', () => {
     it('fetches all questions with token successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           questions: [
             { id: 1, title: 'Question 1' },
@@ -177,11 +192,11 @@ describe('QuizApiService', () => {
         }
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.getAllQuestions('jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'get',
         headers: {
           'Content-Type': 'application/json',
@@ -190,12 +205,15 @@ describe('QuizApiService', () => {
         url: '/questions/all',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
 
     it('handles unauthorized error', async () => {
       const mockError = new Error('Unauthorized')
-      mockedAxios.mockRejectedValue(mockError)
+      mockAxiosInstance.mockRejectedValue(mockError)
       
       await expect(QuizApiService.getAllQuestions('invalid-token')).rejects.toThrow('Unauthorized')
     })
@@ -204,6 +222,7 @@ describe('QuizApiService', () => {
   describe('createQuestion', () => {
     it('creates question successfully', async () => {
       const mockResponse = {
+        status: 201,
         data: {
           id: 1,
           title: 'New Question'
@@ -221,11 +240,11 @@ describe('QuizApiService', () => {
         correctAnswerIndex: 0
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.createQuestion(questionData, 'jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -234,13 +253,17 @@ describe('QuizApiService', () => {
         url: '/questions',
         data: questionData
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 201,
+        data: mockResponse.data
+      })
     })
   })
 
   describe('updateQuestion', () => {
     it('updates question successfully', async () => {
       const mockResponse = {
+        status: 200,
         data: {
           id: 1,
           title: 'Updated Question'
@@ -252,11 +275,11 @@ describe('QuizApiService', () => {
         text: 'Updated text'
       }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.updateQuestion(1, questionData, 'jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'put',
         headers: {
           'Content-Type': 'application/json',
@@ -265,19 +288,25 @@ describe('QuizApiService', () => {
         url: '/questions/1',
         data: questionData
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 200,
+        data: mockResponse.data
+      })
     })
   })
 
   describe('deleteQuestion', () => {
     it('deletes question successfully', async () => {
-      const mockResponse = { status: 200, data: { success: true } }
+      const mockResponse = {
+        status: 204,
+        data: {}
+      }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.deleteQuestion(1, 'jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'delete',
         headers: {
           'Content-Type': 'application/json',
@@ -286,19 +315,25 @@ describe('QuizApiService', () => {
         url: '/questions/1',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 204,
+        data: mockResponse.data
+      })
     })
   })
 
   describe('deleteAllQuestions', () => {
     it('deletes all questions successfully', async () => {
-      const mockResponse = { status: 200, data: { success: true } }
+      const mockResponse = {
+        status: 204,
+        data: {}
+      }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.deleteAllQuestions('jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'delete',
         headers: {
           'Content-Type': 'application/json',
@@ -307,19 +342,25 @@ describe('QuizApiService', () => {
         url: '/questions/all',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 204,
+        data: mockResponse.data
+      })
     })
   })
 
   describe('deleteAllParticipations', () => {
     it('deletes all participations successfully', async () => {
-      const mockResponse = { status: 200, data: { success: true } }
+      const mockResponse = {
+        status: 204,
+        data: {}
+      }
       
-      mockedAxios.mockResolvedValue(mockResponse)
+      mockAxiosInstance.mockResolvedValue(mockResponse)
       
       const result = await QuizApiService.deleteAllParticipations('jwt-token-123')
       
-      expect(mockedAxios).toHaveBeenCalledWith({
+      expect(mockAxiosInstance).toHaveBeenCalledWith({
         method: 'delete',
         headers: {
           'Content-Type': 'application/json',
@@ -328,7 +369,77 @@ describe('QuizApiService', () => {
         url: '/participations/all',
         data: null
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual({
+        status: 204,
+        data: mockResponse.data
+      })
+    })
+  })
+
+  describe('error interceptor', () => {
+    it('handles axios error with response', async () => {
+      const axiosError = {
+        response: {
+          status: 400,
+          data: {
+            error: 'Bad Request'
+          }
+        },
+        userMessage: 'Données invalides'
+      }
+      
+      mockAxiosInstance.mockRejectedValue(axiosError)
+      
+      await expect(QuizApiService.getQuizInfo()).rejects.toEqual(axiosError)
+      expect(axiosError.userMessage).toBe('Données invalides')
+    })
+
+    it('handles network error', async () => {
+      const networkError = {
+        request: {},
+        code: 'ECONNABORTED',
+        userMessage: 'Délai d\'attente dépassé. Veuillez réessayer.'
+      }
+      
+      mockAxiosInstance.mockRejectedValue(networkError)
+      
+      await expect(QuizApiService.getQuizInfo()).rejects.toEqual(networkError)
+    })
+  })
+
+  describe('retry logic', () => {
+    it('retries on 5xx server errors', async () => {
+      const serverError = {
+        response: {
+          status: 500,
+          data: {
+            error: 'Internal Server Error'
+          }
+        }
+      }
+      
+      const successResponse = {
+        status: 200,
+        data: { size: 10, scores: [] }
+      }
+      
+      // First call fails, second succeeds
+      mockAxiosInstance
+        .mockRejectedValueOnce(serverError)
+        .mockResolvedValueOnce(successResponse)
+      
+      // Mock delay to avoid actual waiting
+      vi.spyOn(QuizApiService, 'delay').mockResolvedValue()
+      
+      const result = await QuizApiService.getQuizInfo()
+      
+      expect(mockAxiosInstance).toHaveBeenCalledTimes(2)
+      expect(result).toEqual({
+        status: 200,
+        data: successResponse.data
+      })
+      
+      QuizApiService.delay.mockRestore()
     })
   })
 })

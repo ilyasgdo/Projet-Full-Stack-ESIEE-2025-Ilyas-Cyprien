@@ -12,11 +12,9 @@ class Question(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationship
     answers = db.relationship('Answer', backref='question', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
-        # Sort answers by order field to ensure consistent ordering
         sorted_answers = sorted(self.answers, key=lambda a: a.order)
         return {
             'id': self.id,

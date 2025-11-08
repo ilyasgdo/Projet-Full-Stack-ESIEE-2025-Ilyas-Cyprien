@@ -9,7 +9,7 @@ const isMenuOpen = ref(false)
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-modern">
+  <div id="app" class="min-h-screen bg-modern math-overlay">
     <!-- Navigation Header -->
     <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/10 via-background/80 to-secondary/10 backdrop-blur supports-[backdrop-filter]:bg-background/20">
       <div class="container mx-auto px-4 lg:px-6">
@@ -21,9 +21,9 @@ const isMenuOpen = ref(false)
             aria-label="Aller à l'accueil"
           >
             <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center justify-center">
-              <span class="text-primary-foreground font-bold text-sm">Q</span>
+              <span class="text-primary-foreground font-bold text-sm">π</span>
             </div>
-            <span class="hidden sm:inline-block text-gradient">Quiz App</span>
+            <span class="hidden sm:inline-block text-gradient">Math Quiz</span>
           </router-link>
           
           <!-- Desktop Navigation -->
@@ -90,7 +90,7 @@ const isMenuOpen = ref(false)
     <footer class="border-t bg-muted/50">
       <div class="container mx-auto px-4 lg:px-6 py-6">
         <div class="text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Quiz Application. Tous droits réservés.</p>
+          <p>&copy; 2025 Math Quiz. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

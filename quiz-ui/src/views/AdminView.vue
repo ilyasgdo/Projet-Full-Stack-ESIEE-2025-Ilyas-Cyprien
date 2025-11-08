@@ -88,6 +88,7 @@
             {{ deletingParticipations ? 'Suppression...' : 'Supprimer Toutes les Participations' }}
           </Button>
         </div>
+      </CardContent>
       </Card>
         </div>
       </div>

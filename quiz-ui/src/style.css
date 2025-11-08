@@ -83,6 +83,9 @@
   .hover-float {
     @apply transition-transform duration-300 hover:-translate-y-[1px];
   }
+  .math-badge {
+    @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-semibold bg-primary/10 text-primary ring-1 ring-primary/20 hover-glow hover-float;
+  }
 }
 
 @layer utilities {
@@ -105,7 +108,20 @@
     background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
   }
 
-  /* Ultra-modern utilities */
+  .math-overlay {
+    position: relative;
+  }
+  .math-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-repeat: repeat;
+    background-size: 220px 220px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cstyle%3Etext%7Bfont-family:serif;font-weight:bold;fill:rgba(0,0,0,0.7)%7D%3C/style%3E%3Crect width='100%25' height='100%25' fill='transparent'/%3E%3Ctext x='20' y='40' font-size='32'%3E%CF%80%3C/text%3E%3Ctext x='120' y='70' font-size='38'%3E%E2%88%91%3C/text%3E%3Ctext x='60' y='140' font-size='40'%3E%E2%88%9A%3C/text%3E%3Ctext x='160' y='170' font-size='36'%3E%E2%88%9E%3C/text%3E%3Ctext x='100' y='200' font-size='28'%3Ef(x)%3Dax%5E2%2Bbx%2Bc%3C/text%3E%3Ctext x='170' y='40' font-size='30'%3E%E2%88%AB%3C/text%3E%3Ctext x='30' y='190' font-size='24'%3E%CE%94%3C/text%3E%3C/svg%3E");
+  }
+
   .tilt-hover {
     @apply transform-gpu transition-transform duration-300 hover:-translate-y-[1px] hover:scale-[1.01];
   }

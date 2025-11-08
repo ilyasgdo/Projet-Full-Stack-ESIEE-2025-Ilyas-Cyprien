@@ -2,18 +2,26 @@
   <div class="py-8">
     <!-- Hero Section -->
     <div class="text-center mb-12">
-      <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent drop-shadow-[0_2px_10px_rgba(59,130,246,0.25)]">Bienvenue au Quiz</h1>
-      <p class="text-xl text-muted-foreground mb-8">Testez vos connaissances et défiez-vous !</p>
+      <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent drop-shadow-[0_2px_10px_rgba(59,130,246,0.25)]">Bienvenue au Quiz de Mathématiques</h1>
+      <p class="text-xl text-muted-foreground mb-8">Testez vos connaissances en algèbre, géométrie et analyse !</p>
       <Button variant="gradient" as-child size="lg" class="text-lg px-8 py-3 shadow-lg shadow-primary/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.45)] hover:-translate-y-[1px] hover-float hover-glow transition-all duration-300">
         <router-link to="/new-quiz">
           Participer au Quiz
         </router-link>
       </Button>
+      <div class="flex justify-center gap-2 mt-6">
+        <span class="math-badge" aria-label="Somme">∑</span>
+        <span class="math-badge" aria-label="Intégrale">∫</span>
+        <span class="math-badge" aria-label="Pi">π</span>
+        <span class="math-badge" aria-label="Racine">√</span>
+        <span class="math-badge" aria-label="Infini">∞</span>
+        <span class="math-badge" aria-label="Delta">Δ</span>
+      </div>
     </div>
 
     <!-- Scores Section -->
     <div class="max-w-4xl mx-auto">
-      <h2 class="text-2xl font-bold text-center mb-8 text-gradient">🏆 Meilleurs Scores</h2>
+      <h2 class="text-2xl font-bold text-center mb-8 text-gradient with-gradient-underline">🏆 Meilleurs Scores</h2>
       
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-8">

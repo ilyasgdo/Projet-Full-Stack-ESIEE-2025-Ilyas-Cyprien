@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #333333; stroke-width: 1.5; rx: 6; }
+      .title { font: 700 16px sans-serif; fill: #222222; }
+      .field { font: 400 13px monospace; fill: #333333; }
+      .note { font: 400 12px sans-serif; fill: #555555; }
+      .label { font: 700 12px sans-serif; fill: #222222; }
+      .arrow { stroke: #333333; stroke-width: 1.5; }
+    </style>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- QUESTIONS -->
+  <rect class="box" x="30" y="40" width="320" height="190" />
+  <text class="title" x="40" y="65">questions</text>
+  <text class="field" x="40" y="90">id INTEGER PRIMARY KEY</text>
+  <text class="field" x="40" y="108">position INTEGER UNIQUE NULLABLE</text>
+  <text class="field" x="40" y="126">title VARCHAR(200) NOT NULL</text>
+  <text class="field" x="40" y="144">text TEXT NOT NULL</text>
+  <text class="field" x="40" y="162">image TEXT</text>
+  <text class="field" x="40" y="180">created_at DATETIME</text>
+  <text class="field" x="40" y="198">updated_at DATETIME</text>
+  <text class="note" x="40" y="218">1 question → N answers (cascade delete-orphan)</text>
+
+  <!-- ANSWERS -->
+  <rect class="box" x="380" y="40" width="320" height="170" />
+  <text class="title" x="390" y="65">answers</text>
+  <text class="field" x="390" y="90">id INTEGER PRIMARY KEY</text>
+  <text class="field" x="390" y="108">question_id INTEGER NOT NULL → questions(id)</text>
+  <text class="field" x="390" y="126">text VARCHAR(500) NOT NULL</text>
+  <text class="field" x="390" y="144">is_correct BOOLEAN NOT NULL DEFAULT 0</text>
+  <text class="field" x="390" y="162">order INTEGER NOT NULL DEFAULT 0</text>
+
+  <!-- PARTICIPATIONS -->
+  <rect class="box" x="30" y="270" width="320" height="140" />
+  <text class="title" x="40" y="295">participations</text>
+  <text class="field" x="40" y="320">id INTEGER PRIMARY KEY</text>
+  <text class="field" x="40" y="338">player_name VARCHAR(100) NOT NULL</text>
+  <text class="field" x="40" y="356">score INTEGER NOT NULL</text>
+  <text class="field" x="40" y="374">created_at DATETIME</text>
+
+  <!-- ADMIN SESSIONS -->
+  <rect class="box" x="380" y="270" width="320" height="140" />
+  <text class="title" x="390" y="295">admin_sessions</text>
+  <text class="field" x="390" y="320">id INTEGER PRIMARY KEY</text>
+  <text class="field" x="390" y="338">token VARCHAR(200) UNIQUE NOT NULL</text>
+  <text class="field" x="390" y="356">created_at DATETIME</text>
+  <text class="field" x="390" y="374">expires_at DATETIME NOT NULL</text>
+
+  <!-- RELATION QUESTIONS → ANSWERS -->
+  <line class="arrow" x1="350" y1="135" x2="380" y2="135" marker-end="url(#arrowhead)" />
+  <text class="label" x="330" y="130">1</text>
+  <text class="label" x="385" y="130">N</text>
+
+  <!-- Legend / Notes -->
+  <text class="note" x="30" y="450">Règles métier: Une seule réponse correcte par question (contrainte applicative, pas SQL).</text>
+  <text class="note" x="30" y="468">Stockage: SQLite dans instance/quiz.db (géré par Flask instance_path).</text>
+</svg>

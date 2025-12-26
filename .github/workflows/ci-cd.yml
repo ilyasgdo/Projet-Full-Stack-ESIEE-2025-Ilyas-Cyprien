@@ -69,14 +69,13 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./quiz-ui
+          file: ./quiz-ui/Dockerfile.k8s
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/quiz-ui:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/quiz-ui:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: |
-            VITE_API_URL=http://quiz-backend:5000
 
       - name: 📋 Summary
         run: |

@@ -21,7 +21,7 @@ spec:
       containers:
         - name: quiz-api
           # Replace YOUR_DOCKERHUB_USERNAME with your actual Docker Hub username
-          image: YOUR_DOCKERHUB_USERNAME/quiz-api:latest
+          image: ssssssss3/quiz-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

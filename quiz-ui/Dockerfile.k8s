@@ -1,8 +1,5 @@
 # Version Kubernetes avec API URL pointant vers le service backend Kubernetes
-FROM node:lts-alpine as build
-
-# Installation du framework Vue
-RUN npm install -g @vue/cli
+FROM node:lts-alpine AS build
 
 # Création et positionnement du répertoire par défaut dans le container
 WORKDIR /app

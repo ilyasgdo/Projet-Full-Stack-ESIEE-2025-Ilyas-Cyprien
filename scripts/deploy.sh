@@ -34,16 +34,8 @@ fi
 
 echo -e "${GREEN}✅ Minikube is running${NC}"
 
-# Check if Docker Hub username is set
-if [ -z "$DOCKERHUB_USERNAME" ]; then
-    echo -e "${YELLOW}⚠️  DOCKERHUB_USERNAME environment variable not set${NC}"
-    read -p "Enter your Docker Hub username: " DOCKERHUB_USERNAME
-    
-    if [ -z "$DOCKERHUB_USERNAME" ]; then
-        echo -e "${RED}❌ Docker Hub username is required${NC}"
-        exit 1
-    fi
-fi
+# Check if Docker Hub username is set (default to ssssssss3)
+DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME:-ssssssss3}"
 
 echo -e "${BLUE}📦 Using Docker Hub username: $DOCKERHUB_USERNAME${NC}"
 

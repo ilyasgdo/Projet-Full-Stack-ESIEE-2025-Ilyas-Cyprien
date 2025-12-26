@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quiz-config
+  namespace: default
+  labels:
+    app: quiz
+data:
+  FLASK_ENV: "production"
+  FLASK_DEBUG: "0"
+  # Backend URL for frontend to call (internal cluster DNS)
+  VITE_API_URL: "http://quiz-backend:5000"

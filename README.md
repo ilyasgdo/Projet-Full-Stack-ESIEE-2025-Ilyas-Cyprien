@@ -146,3 +146,102 @@ Tests unitaires avec Vitest couvrant les services et composants principaux.
 Relations: 1 question → N answers (cascade delete)
 
 Stockage: SQLite dans `instance/quiz.db`
+
+## CI/CD Pipeline
+
+### Architecture
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Local Dev      │────▶│  GitHub Actions │────▶│  Docker Hub     │
+│  (git push)     │     │  (Test & Build) │     │  (Images)       │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                         │
+                                                         ▼
+┌─────────────────┐     ┌─────────────────────────────────────────┐
+│  Browser        │────▶│  Minikube Cluster (Local)               │
+│                 │     │  ┌─────────┐      ┌─────────────────┐   │
+│                 │     │  │Frontend │─────▶│Backend + SQLite │   │
+│                 │     │  │NodePort │      │ClusterIP        │   │
+│                 │     │  └─────────┘      └─────────────────┘   │
+└─────────────────┘     └─────────────────────────────────────────┘
+```
+
+### Configuration GitHub Actions
+
+1. **Créer les secrets GitHub** dans Settings → Secrets → Actions:
+   - `DOCKERHUB_USERNAME`: Votre nom d'utilisateur Docker Hub
+   - `DOCKERHUB_TOKEN`: Token d'accès Docker Hub (créer sur hub.docker.com)
+
+2. **Le workflow s'exécute automatiquement** lors d'un push sur `main`/`master`:
+   - ✅ Tests unitaires frontend (Vitest)
+   - 🐳 Build images Docker (backend + frontend)
+   - 📤 Push vers Docker Hub
+
+### Déploiement Kubernetes (Minikube)
+
+#### Prérequis
+```bash
+# macOS (M4 compatible)
+brew install minikube kubectl
+# Docker Desktop doit être installé et démarré
+```
+
+#### Setup Minikube
+```bash
+# Script automatique (recommandé)
+./scripts/setup-minikube.sh
+
+# Ou manuellement
+minikube start --driver=docker --memory=4096 --cpus=2
+```
+
+#### Déploiement Application
+```bash
+# Définir le username Docker Hub
+export DOCKERHUB_USERNAME="votre-username"
+
+# Déployer
+./scripts/deploy.sh
+
+# Accéder à l'application
+minikube service quiz-frontend --url
+```
+
+#### Commandes Utiles
+```bash
+# Status des pods
+kubectl get pods -l app=quiz
+
+# Logs backend
+kubectl logs -l component=backend
+
+# Dashboard Kubernetes
+minikube dashboard
+
+# Redémarrer un déploiement
+kubectl rollout restart deployment/quiz-backend
+kubectl rollout restart deployment/quiz-frontend
+```
+
+## Structure du Projet
+
+```
+├── .github/workflows/     # CI/CD GitHub Actions
+│   └── ci-cd.yml         # Pipeline principal
+├── k8s/                   # Manifests Kubernetes
+│   ├── configmap.yaml    # Configuration non-sensible
+│   ├── secrets.yaml      # Secrets (à personnaliser)
+│   ├── backend-deployment.yaml
+│   └── frontend-deployment.yaml
+├── scripts/               # Scripts de déploiement
+│   ├── setup-minikube.sh # Configuration Minikube M4
+│   └── deploy.sh         # Déploiement K8s
+├── quiz-api/              # Backend Flask
+│   ├── app.py            # Application principale
+│   ├── Dockerfile        # Image Docker
+│   └── requirements.txt  # Dépendances Python
+└── quiz-ui/               # Frontend Vue 3
+    ├── src/              # Code source Vue
+    ├── Dockerfile        # Image Docker
+    └── package.json      # Dépendances npm
+```

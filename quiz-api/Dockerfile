@@ -22,12 +22,15 @@ ENV FLASK_APP=app.py
 # Copie de l'ensemble du code + dépendances
 COPY . .
 
+# Rendre le script d'entrée executable
+RUN chmod +x entrypoint.sh
+
 # Informations sur l'image
 LABEL maintainer="Ilyas Ghandaoui <ilyasghandaoui6@gmail.com>" \
-    version="1.0"
+    version="1.1"
 
 # Exposition du port
 EXPOSE 5000
 
-# Commande de démarrage du serveur gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app:app"]
+# Utiliser le script d'entrée qui initialise la DB avant de démarrer gunicorn
+ENTRYPOINT ["./entrypoint.sh"]

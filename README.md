@@ -4,7 +4,7 @@
 
 > **Projet Cloud Native DevOps - ESIEE Paris 2025**
 > 
-> 👤 **Auteurs**: Ilyas GDOU & Cyprien
+> 👤 **Auteurs**: Ilyas GHANDAOUI & Cyprien
 > 
 > 🎓 **Filière**: Data Engineering / DevOps
 > 

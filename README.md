@@ -1,6 +1,19 @@
 # Qrious - Full Stack (Flask + Vue 3)
 
+[![CI/CD Pipeline](https://github.com/ilyasgdo/Projet-Full-Stack-ESIEE-2025-Ilyas-Cyprien/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ilyasgdo/Projet-Full-Stack-ESIEE-2025-Ilyas-Cyprien/actions/workflows/ci-cd.yml)
+
+> **Projet Cloud Native DevOps - ESIEE Paris 2025**
+> 
+> 👤 **Auteurs**: Ilyas GDOU & Cyprien
+> 
+> 🎓 **Filière**: Data Engineering / DevOps
+> 
+> 📅 **Année académique**: 2024-2025
+> 
+> 🏫 **École**: ESIEE Paris
+
 Application de quiz développée avec Flask (API) et Vue 3 (Frontend) pour le projet ESIEE 2025.
+
 
 ## Fonctionnalités
 

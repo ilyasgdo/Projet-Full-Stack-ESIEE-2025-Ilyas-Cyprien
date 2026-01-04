@@ -15,6 +15,7 @@
 Application de quiz développée avec Flask (API) et Vue 3 (Frontend) pour le projet ESIEE 2025.
 
 
+s
 ## Fonctionnalités
 
 ### Front-Office
